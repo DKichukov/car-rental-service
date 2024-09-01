@@ -2,7 +2,7 @@ version: "4.0"
 
 services:
   db:
-    image: postgres:14.0-alpine3.14
+    image: postgres:14.13-alpine3.20
     container_name: postgres_db
     restart: on-failure
     environment:

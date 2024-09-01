@@ -1,10 +1,9 @@
 package com.example.car_rental_service.mapper;
 
 import com.example.car_rental_service.dto.SignupRequest;
+import com.example.car_rental_service.dto.UserDto;
 import com.example.car_rental_service.entity.User;
 import com.example.car_rental_service.enums.UserRole;
-import com.example.car_rental_service.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 
 public class UserMapper {
 
@@ -18,4 +17,13 @@ public class UserMapper {
         return user;
     }
 
+    public static UserDto toCustomerDto(User user) {
+       UserDto userDto = new UserDto();
+       userDto.setId(user.getId());
+       userDto.setEmail(user.getEmail());
+       userDto.setName(user.getName());
+       userDto.setUserRole(user.getUserRole());
+
+       return userDto;
+    }
 }
