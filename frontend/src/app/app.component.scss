@@ -1,0 +1,28 @@
+.main-header {
+  width: 100%;
+  background-color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.navbar-title a {
+  color: #fff;
+  font-size: 1.5rem;
+  text-decoration: none;
+}
+
+.nav-links a {
+  color: #fff;
+  margin-left: 20px;
+  text-decoration: none;
+}
+
+.nav-links a.active {
+  border-bottom: 2px solid #fff;
+}
+
+.nav-links a[nz-button] {
+  font-size: 1rem;
+}
