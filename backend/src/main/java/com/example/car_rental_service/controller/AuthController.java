@@ -1,5 +1,6 @@
 package com.example.car_rental_service.controller;
 
+import com.example.car_rental_service.config.JwtTokenService;
 import com.example.car_rental_service.dto.AuthenticationRequest;
 import com.example.car_rental_service.dto.AuthenticationResponse;
 import com.example.car_rental_service.dto.SignupRequest;
@@ -8,7 +9,6 @@ import com.example.car_rental_service.entity.User;
 import com.example.car_rental_service.repository.UserRepository;
 import com.example.car_rental_service.service.auth.AuthService;
 import com.example.car_rental_service.service.jwt.UserService;
-import com.example.car_rental_service.config.JwtTokenService;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -57,10 +57,6 @@ public class AuthController {
             ));
         } catch (BadCredentialsException e) {
             throw new BadCredentialsException("Incorrect username or password.");
-        } catch (DisabledException e) {
-            throw new DisabledException("User is disabled.");
-        } catch (UsernameNotFoundException e) {
-            throw new UsernameNotFoundException("User not found.");
         }
 
         final UserDetails userDetails = userService.userDetailsService().loadUserByUsername(authenticationRequest.getEmail());

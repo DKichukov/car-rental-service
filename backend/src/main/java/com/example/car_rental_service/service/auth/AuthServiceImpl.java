@@ -1,7 +1,6 @@
 package com.example.car_rental_service.service.auth;
 
-import static com.example.car_rental_service.mapper.UserMapper.toCustomer;
-import static com.example.car_rental_service.mapper.UserMapper.toCustomerDto;
+import static com.example.car_rental_service.mapper.UserMapper.toUser;
 
 import com.example.car_rental_service.dto.SignupRequest;
 import com.example.car_rental_service.dto.UserDto;
@@ -24,11 +23,8 @@ public class AuthServiceImpl implements AuthService {
         if(signupRequest.email()== null) {
             return null;
         }
-        User user = new User();
-        user.setEmail(signupRequest.email());
-        user.setName(signupRequest.name());
+        User user = toUser(signupRequest, UserRole.CUSTOMER);
         user.setPassword(new BCryptPasswordEncoder().encode(signupRequest.password()));
-        user.setUserRole(UserRole.CUSTOMER);
         userRepository.save(user);
 
         UserDto userDto = new UserDto();
