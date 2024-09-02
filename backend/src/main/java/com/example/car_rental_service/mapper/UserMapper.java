@@ -4,6 +4,7 @@ import com.example.car_rental_service.dto.SignupRequest;
 import com.example.car_rental_service.dto.UserDto;
 import com.example.car_rental_service.entity.User;
 import com.example.car_rental_service.enums.UserRole;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class UserMapper {
 
@@ -11,7 +12,7 @@ public class UserMapper {
         User user = new User();
         user.setEmail(signupRequest.email());
         user.setName(signupRequest.name());
-        user.setPassword(signupRequest.password());
+        user.setPassword(new BCryptPasswordEncoder().encode(signupRequest.password()));
         user.setUserRole(UserRole.CUSTOMER);
 
         return user;

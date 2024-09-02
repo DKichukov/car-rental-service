@@ -5,8 +5,11 @@ import static com.example.car_rental_service.mapper.UserMapper.toCustomerDto;
 
 import com.example.car_rental_service.dto.SignupRequest;
 import com.example.car_rental_service.dto.UserDto;
+import com.example.car_rental_service.entity.User;
+import com.example.car_rental_service.enums.UserRole;
 import com.example.car_rental_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,7 +24,17 @@ public class AuthServiceImpl implements AuthService {
         if(signupRequest.email()== null) {
             return null;
         }
-        return toCustomerDto(userRepository.save(toCustomer(signupRequest)));
+        User user = new User();
+        user.setEmail(signupRequest.email());
+        user.setName(signupRequest.name());
+        user.setPassword(new BCryptPasswordEncoder().encode(signupRequest.password()));
+        user.setUserRole(UserRole.CUSTOMER);
+        userRepository.save(user);
+
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
+
+        return userDto;
     }
 
     @Override
