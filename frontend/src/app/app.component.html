@@ -1,13 +1,63 @@
-<div>
-  <nz-header nz-row nzType="flex" class="main-header custom-navbar">
-    <div class="navbar-title">
-      <a routerLink="/login">Car Rental Service</a>
-    </div>
-    <div class="nav-links">
-      <a nz-button nzType="link" routerLink="/register" routerLinkActive="active">Sign Up</a>
-      <a nz-button nzType="link" routerLink="/login" routerLinkActive="active">Login</a>
-    </div>
-  </nz-header>
-</div>
+<nz-header nz-row nzType="flex" class="main-header custom-navbar">
+  <div class="navbar-title">
+    <a routerLink="/login">
+      <ng-container [ngSwitch]="true">
+        <span *ngSwitchCase="isAdminLoggedIn">LoggedIn Admin</span>
+        <span *ngSwitchCase="isCustomerLoggedIn">LoggedIn Customer</span>
+        <span *ngSwitchDefault>Car Rental Service</span>
+      </ng-container>
+    </a>
+  </div>
+  <div class="nav-links">
+    <ng-container [ngSwitch]="true">
+
+      <ng-container *ngSwitchCase="isAdminLoggedIn">
+        <a
+          nz-button
+          nzType="link"
+          routerLink="/admin/dashboard"
+          routerLinkActive="active"
+          >Dashboard</a
+        >
+         <a
+          nz-button
+          nzType="link"
+          routerLink="/admin/car"
+          routerLinkActive="active"
+          >Post Car</a
+        >
+        <a nz-button nzType="link" (click)="logout()" routerLinkActive="active"
+          >Logout</a
+        >
+      </ng-container>
+
+      <ng-container *ngSwitchCase="isCustomerLoggedIn">
+        <a
+          nz-button
+          nzType="link"
+          routerLink="/customer/dashboard"
+          routerLinkActive="active"
+          >Dashboard</a
+        >
+        <a nz-button nzType="link" (click)="logout()" routerLinkActive="active"
+          >Logout</a
+        >
+      </ng-container>
+
+      <ng-container *ngSwitchDefault>
+        <a
+          nz-button
+          nzType="link"
+          routerLink="/register"
+          routerLinkActive="active"
+          >Sign Up</a
+        >
+        <a nz-button nzType="link" routerLink="/login" routerLinkActive="active"
+          >Login</a
+        >
+      </ng-container>
+    </ng-container>
+  </div>
+</nz-header>
 
 <router-outlet></router-outlet>

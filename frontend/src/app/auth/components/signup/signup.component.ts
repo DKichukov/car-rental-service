@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AuthService } from "../../services/auth/auth.service";
 import {NzMessageService} from "ng-zorro-antd/message";
@@ -9,7 +9,7 @@ import { Router } from "@angular/router";
   templateUrl: "./signup.component.html",
   styleUrls: ["./signup.component.scss"],
 })
-export class SignupComponent {
+export class SignupComponent  implements OnInit {
   isSpinning: boolean = false;
   signupForm!: FormGroup;
 

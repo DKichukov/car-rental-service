@@ -18,6 +18,7 @@ public class AuthServiceImpl implements AuthService {
 
   private final UserRepository userRepository;
 
+  //TODO: for development purpose only, remove after deployment!
   @PostConstruct
   public void createAdminAccount() {
     User adminAccount = userRepository.findByUserRole(UserRole.ADMIN);

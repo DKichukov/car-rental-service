@@ -1,10 +1,10 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 
-const TOKEN = "token";
-const USER = "user";
+const TOKEN = 'token';
+const USER = 'user';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class StorageService {
   constructor() {}
@@ -30,19 +30,20 @@ export class StorageService {
 
   static getUserRole(): string {
     const storedUser = this.getUser();
-    if (storedUser == null) return "";
+    if (storedUser == null) return '';
     return storedUser.role;
   }
 
   static isAdminLoggedIn(): boolean {
-    if (this.getToken() == null) return false;
-    const role: string = this.getUserRole();
-    return role == "ADMIN";
+    return this.getToken() !== null && this.getUserRole() === 'ADMIN';
   }
-  
-    static isCustomerLoggedIn(): boolean {
-    if (this.getToken() == null) return false;
-    const role: string = this.getUserRole();
-    return role == "CUSTOMER";
+
+  static isCustomerLoggedIn(): boolean {
+    return this.getToken() !== null && this.getUserRole() === 'CUSTOMER';
+  }
+
+  static logout(): void {
+    window.localStorage.removeItem(USER);
+    window.localStorage.removeItem(TOKEN);
   }
 }

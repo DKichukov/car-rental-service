@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AuthService } from "../../services/auth/auth.service";
 import { StorageService } from "../../services/storage/storage.service";
@@ -10,7 +10,7 @@ import { NzMessageService } from "ng-zorro-antd/message";
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.scss"],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   isSpinning: boolean = false;
   loginFrom!: FormGroup;
 
@@ -22,6 +22,8 @@ export class LoginComponent {
       password: ["", [Validators.required]],
     });
   }
+  
+  
   login() {
     console.log(this.loginFrom.value);
     this.authService.login(this.loginFrom.value).subscribe((data) => {
