@@ -8,7 +8,7 @@ const USER = 'user';
 })
 export class StorageService {
   constructor() {}
-
+  
   static saveToken(token: string) {
     window.localStorage.removeItem(TOKEN);
     window.localStorage.setItem(TOKEN, token);

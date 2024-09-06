@@ -10,12 +10,13 @@
             <!-- Image Upload Section -->
             <div nz-col [nzMd]="24" [nzSm]="24" [nzXs]="24">
               <div class="profile-badge">
-                <label
-                  for="upload_profile_image"
-                  class="upload-label"
-                  *ngIf="selectedFile"
-                >
-                  <img class="profile" [src]="imagePreview" alt="profile" />
+                <label for="upload_profile_image" class="upload-label">
+                  <img
+                    *ngIf="imagePreview"
+                    class="profile"
+                    [src]="imagePreview"
+                    alt="profile"
+                  />
                 </label>
                 <input
                   type="file"
