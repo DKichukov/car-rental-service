@@ -22,6 +22,7 @@ import com.example.car_rental_service.repository.UserRepository;
 import jakarta.inject.Inject;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 
 @Testcontainers
 @AutoConfigureMockMvc
@@ -60,6 +62,13 @@ class AdminControllerTest {
   @Autowired
   private PostgreSQLContainer<?> postgresContainer;
 
+  private static String createAuthRequest()
+      throws JsonProcessingException, com.fasterxml.jackson.core.JsonProcessingException {
+    AuthenticationRequest authenticationRequest =
+        createAuthenticationRequest(ADMIN_TEST_EMAIL, ADMIN_RAW_PASSWORD);
+    return convertToJson(authenticationRequest);
+  }
+
   @BeforeEach
   void setUp() {
     if (userRepository.count() > 0) {
@@ -78,14 +87,10 @@ class AdminControllerTest {
 
   @Test
   void testCarPostRequestWithValidAdminCredentials() throws Exception {
-    User adminUser = createUser(ADMIN_NAME, ADMIN_TEST_EMAIL, encodePassword(ADMIN_RAW_PASSWORD),
-        UserRole.ADMIN);
-    userRepository.save(adminUser);
+    createAdminUser();
     CarDto carDto = createCarDto();
 
-    AuthenticationRequest authenticationRequest =
-        createAuthenticationRequest(ADMIN_TEST_EMAIL, ADMIN_RAW_PASSWORD);
-    String authRequestBody = convertToJson(authenticationRequest);
+    String authRequestBody = createAuthRequest();
 
     MvcResult loginResult = mockMvc.perform(
         MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
@@ -103,19 +108,46 @@ class AdminControllerTest {
   }
 
   @Test
+  void testGetCarWithValidAdminCredentials() throws Exception {
+    createAdminUser();
+
+    CarDto carDto = createCarDto();
+    Car savedCar = carRepository.save(toEntity(carDto));
+    Integer carId = savedCar.getId();
+
+    String authRequestBody = createAuthRequest();
+
+    MvcResult loginResult = mockMvc.perform(
+        MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
+            .content(authRequestBody)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    String jwtToken = extractJwtToken(loginResult);
+
+    MvcResult carResult = mockMvc.perform(MockMvcRequestBuilders.get(ADMIN_URL + "/car/{id}", carId)
+            .header("Authorization", "Bearer " + jwtToken))
+        .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    CarDto retrievedCarDto = parseResponseBody(carResult, CarDto.class);
+    assertEquals(carDto.getName(), retrievedCarDto.getName());
+    assertEquals(carDto.getBrand(), retrievedCarDto.getBrand());
+    assertEquals(carDto.getType(), retrievedCarDto.getType());
+    assertEquals(carDto.getColor(), retrievedCarDto.getColor());
+    assertEquals(carDto.getYear(), retrievedCarDto.getYear());
+    assertEquals(carDto.getTransmission(), retrievedCarDto.getTransmission());
+    assertEquals(carDto.getPrice(), retrievedCarDto.getPrice());
+    assertEquals(carDto.getDescription(), retrievedCarDto.getDescription());
+  }
+
+  @Test
   void testGetAllCarsWithValidAdminCredentials() throws Exception {
-    User adminUser = createUser(ADMIN_NAME, ADMIN_TEST_EMAIL, encodePassword(ADMIN_RAW_PASSWORD),
-        UserRole.ADMIN);
-    userRepository.save(adminUser);
+    createAdminUser();
 
     CarDto carDto1 = createCarDto();
     CarDto carDto2 = createCarDto();
     carRepository.save(toEntity(carDto1));
     carRepository.save(toEntity(carDto2));
 
-    AuthenticationRequest authenticationRequest =
-        createAuthenticationRequest(ADMIN_TEST_EMAIL, ADMIN_RAW_PASSWORD);
-    String authRequestBody = convertToJson(authenticationRequest);
+    String authRequestBody = createAuthRequest();
 
     MvcResult loginResult = mockMvc.perform(
         MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
@@ -135,17 +167,13 @@ class AdminControllerTest {
 
   @Test
   void testDeleteCarWithValidAdminCredentials() throws Exception {
-    User adminUser = createUser(ADMIN_NAME, ADMIN_TEST_EMAIL, encodePassword(ADMIN_RAW_PASSWORD),
-        UserRole.ADMIN);
-    userRepository.save(adminUser);
+    createAdminUser();
 
     CarDto carDto = createCarDto();
     Car savedCar = carRepository.save(toEntity(carDto));
     Integer carId = savedCar.getId();
 
-    AuthenticationRequest authenticationRequest =
-        createAuthenticationRequest(ADMIN_TEST_EMAIL, ADMIN_RAW_PASSWORD);
-    String authRequestBody = convertToJson(authenticationRequest);
+    String authRequestBody = createAuthRequest();
 
     MvcResult loginResult = mockMvc.perform(
         MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
@@ -158,6 +186,44 @@ class AdminControllerTest {
         .andExpect(MockMvcResultMatchers.status().isOk());
 
     assertFalse(carRepository.findById(carId).isPresent());
+  }
+
+  @Test
+  void testUpdateCarWithValidAdminCredentials() throws Exception {
+
+    createAdminUser();
+
+    CarDto carDto = createCarDto();
+    Car savedCar = carRepository.save(toEntity(carDto));
+    Integer carId = savedCar.getId();
+
+    String authRequestBody = createAuthRequest();
+
+    MvcResult loginResult = mockMvc.perform(
+        MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
+            .content(authRequestBody)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    String jwtToken = extractJwtToken(loginResult);
+
+    CarDto updatedCarDto = createCarDto();
+    updatedCarDto.setName("Updated Corolla");
+
+    mockMvc.perform(MockMvcRequestBuilders.put(ADMIN_URL + "/car/{carId}", carId)
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED).param("name", updatedCarDto.getName())
+            .header("Authorization", "Bearer " + jwtToken))
+        .andExpect(MockMvcResultMatchers.status().isOk());
+
+    // Verify that the car is updated in the repository
+    Optional<Car> updatedCarOptional = carRepository.findById(carId);
+    assertTrue(updatedCarOptional.isPresent());
+    Car updatedCar = updatedCarOptional.get();
+    assertEquals(updatedCarDto.getName(), updatedCar.getName());
+  }
+
+  private void createAdminUser() {
+    User adminUser = createUser(ADMIN_NAME, ADMIN_TEST_EMAIL, encodePassword(ADMIN_RAW_PASSWORD),
+        UserRole.ADMIN);
+    userRepository.save(adminUser);
   }
 
   private CarDto createCarDto() {

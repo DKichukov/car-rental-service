@@ -11,4 +11,9 @@ public interface AdminService {
   List<CarDto> getAllCars();
 
   void deleteCar(Integer id);
+
+  CarDto getCarById(Integer id);
+
+
+  boolean updateCar(Integer carId, CarDto carDto) throws IOException;
 }
