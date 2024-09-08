@@ -1,5 +1,6 @@
 import { HttpClient, HttpHandler, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { Observable } from 'rxjs';
 import { StorageService } from 'src/app/auth/services/storage/storage.service';
 
@@ -9,7 +10,8 @@ const BASE_URL = ['http://localhost:8080'];
   providedIn: 'root',
 })
 export class AdminService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+  private message:NzMessageService) {}
 
   postCar(carDto: any): Observable<any> {
     const headers = this.createAuthorizationHeader();

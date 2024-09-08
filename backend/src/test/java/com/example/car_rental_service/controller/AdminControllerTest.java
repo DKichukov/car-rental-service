@@ -5,6 +5,7 @@ import static com.example.car_rental_service.utils.AuthUtil.createAuthentication
 import static com.example.car_rental_service.utils.AuthUtil.createUser;
 import static com.example.car_rental_service.utils.AuthUtil.encodePassword;
 import static com.example.car_rental_service.utils.AuthUtil.extractJwtToken;
+import static com.example.car_rental_service.utils.CarUtils.createCarDto;
 import static com.example.car_rental_service.utils.JsonUtil.convertToJson;
 import static com.example.car_rental_service.utils.JsonUtil.parseResponseBody;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,7 +21,6 @@ import com.example.car_rental_service.enums.UserRole;
 import com.example.car_rental_service.repository.CarRepository;
 import com.example.car_rental_service.repository.UserRepository;
 import jakarta.inject.Inject;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,12 +62,7 @@ class AdminControllerTest {
   @Autowired
   private PostgreSQLContainer<?> postgresContainer;
 
-  private static String createAuthRequest()
-      throws JsonProcessingException, com.fasterxml.jackson.core.JsonProcessingException {
-    AuthenticationRequest authenticationRequest =
-        createAuthenticationRequest(ADMIN_TEST_EMAIL, ADMIN_RAW_PASSWORD);
-    return convertToJson(authenticationRequest);
-  }
+
 
   @BeforeEach
   void setUp() {
@@ -213,7 +208,6 @@ class AdminControllerTest {
             .header("Authorization", "Bearer " + jwtToken))
         .andExpect(MockMvcResultMatchers.status().isOk());
 
-    // Verify that the car is updated in the repository
     Optional<Car> updatedCarOptional = carRepository.findById(carId);
     assertTrue(updatedCarOptional.isPresent());
     Car updatedCar = updatedCarOptional.get();
@@ -226,18 +220,11 @@ class AdminControllerTest {
     userRepository.save(adminUser);
   }
 
-  private CarDto createCarDto() {
-    CarDto carDto = new CarDto();
-    carDto.setBrand("bwm");
-    carDto.setColor("white");
-    carDto.setName("name");
-    carDto.setTransmission("transmission");
-    carDto.setType("type");
-    carDto.setDescription("Test description");
-    carDto.setPrice(100L);
-    carDto.setYear(new Date(2024, 9, 1));
-    carDto.setImage(null);
-
-    return carDto;
+  private String createAuthRequest()
+      throws JsonProcessingException, com.fasterxml.jackson.core.JsonProcessingException {
+    AuthenticationRequest authenticationRequest =
+        createAuthenticationRequest(ADMIN_TEST_EMAIL, ADMIN_RAW_PASSWORD);
+    return convertToJson(authenticationRequest);
   }
+
 }

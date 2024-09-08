@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { PostCarComponent } from './components/post-car/post-car.component';
-import { UdateCarComponent } from './components/udate-car/udate-car.component';
+import { UdateCarComponent } from './components/update-car/update-car.component';
 
 const routes: Routes = [
   { path: 'dashboard', component: AdminDashboardComponent },

@@ -6,9 +6,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
-  selector: 'app-udate-car',
-  templateUrl: './udate-car.component.html',
-  styleUrls: ['./udate-car.component.scss'],
+  selector: 'app-update-car',
+  templateUrl: './update-car.component.html',
+  styleUrls: ['./update-car.component.scss'],
 })
 export class UdateCarComponent implements OnInit {
   isSpinning: boolean = false;
