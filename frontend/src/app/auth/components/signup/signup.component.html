@@ -13,7 +13,12 @@
               nzHasFeedback
               nzErrorTip="The input is not valid E-mail!"
             >
-              <input nz-input placeholder="E-mail" id="email" formControlName="email" />
+              <input
+                nz-input
+                placeholder="E-mail"
+                id="email"
+                formControlName="email"
+              />
             </nz-form-control>
           </nz-form-item>
 
@@ -60,7 +65,12 @@
 
           <nz-form-item>
             <nz-form-control nzHasFeedback [nzErrorTip]="userErrorTpl">
-              <input nz-input placeholder="Name" id="username" formControlName="name"/>
+              <input
+                nz-input
+                placeholder="Name"
+                id="username"
+                formControlName="name"
+              />
               <ng-template #userErrorTpl let-control>
                 <ng-container *ngIf="control.hasError('required')">
                   Please input your username!
@@ -72,7 +82,9 @@
           <button
             nz-button
             class="login-form-button login-form-margin"
-            [nzType]="'primary'" (click)="register()"[disabled]="signupForm.invalid"
+            [nzType]="'primary'"
+            (click)="register()"
+            [disabled]="signupForm.invalid"
           >
             Register
           </button>

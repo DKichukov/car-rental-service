@@ -23,12 +23,17 @@ export class AdminService {
     let autHeaders: HttpHeaders = new HttpHeaders();
     return autHeaders.set(
       'Authorization',
-      'Bearer ' + StorageService.getToken()
+      'Bearer ' + StorageService.getToken(),
     );
   }
 
   getAllCars(): Observable<any> {
     return this.http.get(BASE_URL + '/api/admin/cars', {
+      headers: this.createAuthorizationHeader(),
+    });
+  }
+  deleteCar(id: number): Observable<any> {
+    return this.http.delete(BASE_URL + '/api/admin/car/' + id, {
       headers: this.createAuthorizationHeader(),
     });
   }

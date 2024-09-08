@@ -37,7 +37,7 @@ export class PostCarComponent implements OnInit {
     private fb: FormBuilder,
     private adminService: AdminService,
     private message: NzMessageService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {

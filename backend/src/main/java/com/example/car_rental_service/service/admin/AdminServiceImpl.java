@@ -8,6 +8,7 @@ import com.example.car_rental_service.mapper.CarMapper;
 import com.example.car_rental_service.repository.CarRepository;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +32,11 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public List<CarDto> getAllCars() {
     return carRepository.findAll().stream().map(CarMapper::toDto).toList();
+  }
+
+  @Override
+  public void deleteCar(Integer id) {
+    Optional<Car> foundCar = carRepository.findById(id);
+    foundCar.ifPresent(carRepository::delete);
   }
 }

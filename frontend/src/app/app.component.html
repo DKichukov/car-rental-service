@@ -10,7 +10,6 @@
   </div>
   <div class="nav-links">
     <ng-container [ngSwitch]="true">
-
       <ng-container *ngSwitchCase="isAdminLoggedIn">
         <a
           nz-button
@@ -19,7 +18,7 @@
           routerLinkActive="active"
           >Dashboard</a
         >
-         <a
+        <a
           nz-button
           nzType="link"
           routerLink="/admin/car"

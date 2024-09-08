@@ -6,19 +6,20 @@ import static com.example.car_rental_service.utils.AuthUtil.createUser;
 import static com.example.car_rental_service.utils.AuthUtil.encodePassword;
 import static com.example.car_rental_service.utils.AuthUtil.extractJwtToken;
 import static com.example.car_rental_service.utils.JsonUtil.convertToJson;
+import static com.example.car_rental_service.utils.JsonUtil.parseResponseBody;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.car_rental_service.config.TestcontainersConfig;
 import com.example.car_rental_service.dto.AuthenticationRequest;
 import com.example.car_rental_service.dto.CarDto;
+import com.example.car_rental_service.entity.Car;
 import com.example.car_rental_service.entity.User;
 import com.example.car_rental_service.enums.UserRole;
 import com.example.car_rental_service.repository.CarRepository;
 import com.example.car_rental_service.repository.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -93,13 +94,12 @@ class AdminControllerTest {
     String jwtToken = extractJwtToken(loginResult);
     String carRequestBody = convertToJson(carDto);
 
-    MvcResult carResult = mockMvc.perform(
+    mockMvc.perform(
             MockMvcRequestBuilders.post(ADMIN_URL + "/car").contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + jwtToken).content(carRequestBody))
         .andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
 
     assertTrue(carRepository.count() > 0);
-
   }
 
   @Test
@@ -128,11 +128,36 @@ class AdminControllerTest {
                 .header("Authorization", "Bearer " + jwtToken))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-    String responseContent = carResult.getResponse().getContentAsString();
-    List<CarDto> cars =
-        Arrays.asList(new ObjectMapper().readValue(responseContent, CarDto[].class));
+    List<?> cars = parseResponseBody(carResult, List.class);
 
     assertEquals(2, cars.size());
+  }
+
+  @Test
+  void testDeleteCarWithValidAdminCredentials() throws Exception {
+    User adminUser = createUser(ADMIN_NAME, ADMIN_TEST_EMAIL, encodePassword(ADMIN_RAW_PASSWORD),
+        UserRole.ADMIN);
+    userRepository.save(adminUser);
+
+    CarDto carDto = createCarDto();
+    Car savedCar = carRepository.save(toEntity(carDto));
+    Integer carId = savedCar.getId();
+
+    AuthenticationRequest authenticationRequest =
+        createAuthenticationRequest(ADMIN_TEST_EMAIL, ADMIN_RAW_PASSWORD);
+    String authRequestBody = convertToJson(authenticationRequest);
+
+    MvcResult loginResult = mockMvc.perform(
+        MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
+            .content(authRequestBody)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    String jwtToken = extractJwtToken(loginResult);
+
+    mockMvc.perform(MockMvcRequestBuilders.delete(ADMIN_URL + "/car/{id}", carId)
+            .header("Authorization", "Bearer " + jwtToken))
+        .andExpect(MockMvcResultMatchers.status().isOk());
+
+    assertFalse(carRepository.findById(carId).isPresent());
   }
 
   private CarDto createCarDto() {

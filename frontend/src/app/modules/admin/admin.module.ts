@@ -8,9 +8,15 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NgZorroImportsModule } from 'src/app/ngZorroImportsModule';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-
 @NgModule({
   declarations: [AdminDashboardComponent, PostCarComponent],
-  imports: [CommonModule, AdminRoutingModule, NzSpinModule, NgZorroImportsModule, ReactiveFormsModule, FormsModule],
+  imports: [
+    CommonModule,
+    AdminRoutingModule,
+    NzSpinModule,
+    NgZorroImportsModule,
+    ReactiveFormsModule,
+    FormsModule,
+  ],
 })
 export class AdminModule {}
