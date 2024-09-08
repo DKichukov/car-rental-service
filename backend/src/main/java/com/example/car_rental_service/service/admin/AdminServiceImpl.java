@@ -4,8 +4,10 @@ import static com.example.car_rental_service.mapper.CarMapper.toEntity;
 
 import com.example.car_rental_service.dto.CarDto;
 import com.example.car_rental_service.entity.Car;
+import com.example.car_rental_service.mapper.CarMapper;
 import com.example.car_rental_service.repository.CarRepository;
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,5 +26,10 @@ public class AdminServiceImpl implements AdminService {
     } catch (IOException e) {
       return false;
     }
+  }
+
+  @Override
+  public List<CarDto> getAllCars() {
+    return carRepository.findAll().stream().map(CarMapper::toDto).toList();
   }
 }

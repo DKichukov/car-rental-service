@@ -26,4 +26,10 @@ export class AdminService {
       'Bearer ' + StorageService.getToken()
     );
   }
+
+  getAllCars(): Observable<any> {
+    return this.http.get(BASE_URL + '/api/admin/cars', {
+      headers: this.createAuthorizationHeader(),
+    });
+  }
 }

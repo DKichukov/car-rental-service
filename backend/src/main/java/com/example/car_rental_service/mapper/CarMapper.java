@@ -22,4 +22,20 @@ public class CarMapper {
     return car;
   }
 
+  public static CarDto toDto(Car car) {
+    CarDto carDto = new CarDto();
+    carDto.setId(car.getId());
+    carDto.setBrand(car.getBrand());
+    carDto.setColor(car.getColor());
+    carDto.setName(car.getName());
+    carDto.setTransmission(car.getTransmission());
+    carDto.setType(car.getType());
+    carDto.setDescription(car.getDescription());
+    carDto.setPrice(car.getPrice());
+    carDto.setYear(car.getYear());
+    carDto.setReturnedImage(car.getImage() != null ? car.getImage() : null);
+
+    return carDto;
+  }
+
 }
