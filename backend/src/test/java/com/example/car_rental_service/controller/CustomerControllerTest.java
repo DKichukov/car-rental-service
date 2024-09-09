@@ -5,17 +5,21 @@ import static com.example.car_rental_service.utils.AuthUtil.createAuthentication
 import static com.example.car_rental_service.utils.AuthUtil.createUser;
 import static com.example.car_rental_service.utils.AuthUtil.encodePassword;
 import static com.example.car_rental_service.utils.AuthUtil.extractJwtToken;
-import static com.example.car_rental_service.utils.CarUtils.createCarDto;
 import static com.example.car_rental_service.utils.JsonUtil.convertToJson;
 import static com.example.car_rental_service.utils.JsonUtil.parseResponseBody;
+import static com.example.car_rental_service.utils.TestDataGenerator.createCarDto;
+import static com.example.car_rental_service.utils.TestDataGenerator.createDummyBookACarDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.car_rental_service.config.TestcontainersConfig;
 import com.example.car_rental_service.dto.AuthenticationRequest;
+import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
+import com.example.car_rental_service.entity.Car;
 import com.example.car_rental_service.entity.User;
 import com.example.car_rental_service.enums.UserRole;
+import com.example.car_rental_service.repository.BookACarRepository;
 import com.example.car_rental_service.repository.CarRepository;
 import com.example.car_rental_service.repository.UserRepository;
 import jakarta.inject.Inject;
@@ -56,8 +60,9 @@ class CustomerControllerTest {
   @Inject
   CarRepository carRepository;
   @Autowired
+  BookACarRepository bookingRepository;
+  @Autowired
   private PostgreSQLContainer<?> postgresContainer;
-
 
   @BeforeEach
   void setUp() {
@@ -100,6 +105,75 @@ class CustomerControllerTest {
     List<?> cars = parseResponseBody(carResult, List.class);
 
     assertEquals(2, cars.size());
+  }
+
+  @Test
+  void testBookACarWithValidCustomerCredentials() throws Exception {
+
+    User customerUser =
+        createUser(CUSTOMER_NAME, CUSTOMER_TEST_EMAIL, encodePassword(CUSTOMER_RAW_PASSWORD),
+            UserRole.CUSTOMER);
+    userRepository.save(customerUser);
+
+    CarDto carDto = createCarDto();
+    Car savedCar = carRepository.save(toEntity(carDto));
+    Integer carId = savedCar.getId();
+
+    AuthenticationRequest authenticationRequest =
+        createAuthenticationRequest(CUSTOMER_TEST_EMAIL, CUSTOMER_RAW_PASSWORD);
+    String authRequestBody = convertToJson(authenticationRequest);
+
+    MvcResult loginResult = mockMvc.perform(
+        MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
+            .content(authRequestBody)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    String jwtToken = extractJwtToken(loginResult);
+
+    BookACarDto bookACarDto = createDummyBookACarDto(customerUser.getId(), carId);
+    String bookingRequestBody = convertToJson(bookACarDto);
+
+    mockMvc.perform(MockMvcRequestBuilders.post(CUSTOMER_URL + "/car/book")
+        .contentType(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + jwtToken)
+        .content(bookingRequestBody)).andExpect(MockMvcResultMatchers.status().isCreated());
+
+    assertTrue(bookingRepository.count() > 0);
+  }
+
+  @Test
+  void testGetCarByIdWithValidCustomerCredentials() throws Exception {
+    User customerUser =
+        createUser(CUSTOMER_NAME, CUSTOMER_TEST_EMAIL, encodePassword(CUSTOMER_RAW_PASSWORD),
+            UserRole.CUSTOMER);
+    userRepository.save(customerUser);
+
+    CarDto carDto = createCarDto();
+    Car savedCar = carRepository.save(toEntity(carDto));
+    Integer carId = savedCar.getId();
+
+    AuthenticationRequest authenticationRequest =
+        createAuthenticationRequest(CUSTOMER_TEST_EMAIL, CUSTOMER_RAW_PASSWORD);
+    String authRequestBody = convertToJson(authenticationRequest);
+
+    MvcResult loginResult = mockMvc.perform(
+        MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
+            .content(authRequestBody)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    String jwtToken = extractJwtToken(loginResult);
+
+    MvcResult carResult = mockMvc.perform(
+            MockMvcRequestBuilders.get(CUSTOMER_URL + "/car/{carId}", carId)
+                .header("Authorization", "Bearer " + jwtToken))
+        .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    CarDto retrievedCarDto = parseResponseBody(carResult, CarDto.class);
+    assertEquals(carDto.getName(), retrievedCarDto.getName());
+    assertEquals(carDto.getBrand(), retrievedCarDto.getBrand());
+    assertEquals(carDto.getType(), retrievedCarDto.getType());
+    assertEquals(carDto.getColor(), retrievedCarDto.getColor());
+    assertEquals(carDto.getYear(), retrievedCarDto.getYear());
+    assertEquals(carDto.getTransmission(), retrievedCarDto.getTransmission());
+    assertEquals(carDto.getPrice(), retrievedCarDto.getPrice());
+    assertEquals(carDto.getDescription(), retrievedCarDto.getDescription());
   }
 
   private void createCustomerUser() {

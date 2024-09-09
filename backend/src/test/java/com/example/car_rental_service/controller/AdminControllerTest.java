@@ -5,9 +5,9 @@ import static com.example.car_rental_service.utils.AuthUtil.createAuthentication
 import static com.example.car_rental_service.utils.AuthUtil.createUser;
 import static com.example.car_rental_service.utils.AuthUtil.encodePassword;
 import static com.example.car_rental_service.utils.AuthUtil.extractJwtToken;
-import static com.example.car_rental_service.utils.CarUtils.createCarDto;
 import static com.example.car_rental_service.utils.JsonUtil.convertToJson;
 import static com.example.car_rental_service.utils.JsonUtil.parseResponseBody;
+import static com.example.car_rental_service.utils.TestDataGenerator.createCarDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
