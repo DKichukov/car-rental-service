@@ -23,11 +23,17 @@ export class CustomerService {
     });
   }
 
+  bookACar(bookCarDto: any): Observable<any> {
+    return this.http.post(BASE_URL + '/api/customer/car/book', bookCarDto, {
+      headers: this.createAuthorizationHeader(),
+    });
+  }
+
   createAuthorizationHeader(): HttpHeaders {
     let autHeaders: HttpHeaders = new HttpHeaders();
     return autHeaders.set(
       'Authorization',
-      'Bearer ' + StorageService.getToken()
+      'Bearer ' + StorageService.getToken(),
     );
   }
 }

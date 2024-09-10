@@ -2,23 +2,17 @@
   <div class="car-list">
     <div class="car" *ngFor="let car of cars">
       <div class="car-image">
-        <img
-          class="profile"
-          [src]="car.processedImg"
-          alt="profile"
-        />
+        <img class="profile" [src]="car.processedImg" alt="profile" />
       </div>
       <div class="car-details">
-        <h2 class="car-title">
-          {{ car.brand }} {{ car.name }}
-        </h2>
+        <h2 class="car-title">{{ car.brand }} {{ car.name }}</h2>
         <p class="car-description">{{ car.description }}</p>
         <hr />
         <div class="car-specs">
           <h5>
             Price : <b>${{ car.price }}</b> - Color: <b>{{ car.color }}</b> -
             Transmission : <b>{{ car.transmission }}</b> - Type :
-            <b>{{ car.type }}</b> - Year: <b>{{ car.year | date : "yyyy" }}</b>
+            <b>{{ car.type }}</b> - Year: <b>{{ car.year | date: "yyyy" }}</b>
           </h5>
         </div>
         <div class="book-button">
@@ -26,9 +20,9 @@
             nzSize="small"
             nz-button
             nzType="primary"
-            [routerLink]="['/customer/book', car.id]" 
+            [routerLink]="['/customer/book', car.id]"
           >
-          Book
+            Book
           </button>
         </div>
       </div>

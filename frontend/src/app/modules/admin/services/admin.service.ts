@@ -10,8 +10,10 @@ const BASE_URL = ['http://localhost:8080'];
   providedIn: 'root',
 })
 export class AdminService {
-  constructor(private http: HttpClient,
-  private message:NzMessageService) {}
+  constructor(
+    private http: HttpClient,
+    private message: NzMessageService,
+  ) {}
 
   postCar(carDto: any): Observable<any> {
     const headers = this.createAuthorizationHeader();
@@ -25,7 +27,7 @@ export class AdminService {
     let autHeaders: HttpHeaders = new HttpHeaders();
     return autHeaders.set(
       'Authorization',
-      'Bearer ' + StorageService.getToken()
+      'Bearer ' + StorageService.getToken(),
     );
   }
 

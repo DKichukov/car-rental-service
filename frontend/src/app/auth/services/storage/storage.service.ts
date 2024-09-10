@@ -28,6 +28,12 @@ export class StorageService {
     return storedUser ? JSON.parse(storedUser) : undefined;
   }
 
+  static getUserId(): string {
+    const user = this.getUser();
+    if (user == null) return '';
+    return user.id;
+  }
+
   static getUserRole(): string {
     const storedUser = this.getUser();
     if (storedUser == null) return '';

@@ -9,9 +9,10 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 })
 export class CustomerDashboardComponent {
   cars: any[] = [];
+
   constructor(
     private customerService: CustomerService,
-    private message: NzMessageService
+    private message: NzMessageService,
   ) {}
 
   ngOnInit(): void {

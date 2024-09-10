@@ -2,12 +2,16 @@
   background-color: #f8f8f8;
   min-height: 91vh;
   padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .car-list {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  margin-bottom: 40px;
 }
 
 .car {
@@ -59,11 +63,98 @@
   font-size: 16px;
 }
 
-.book-button {
-  float: right;
-  margin-top: 20px;
+.dashboard-filter {
+  width: 80%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.book-button button {
-  margin-left: 10px;
+.filter-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px; /* Add some spacing between rows */
+  width: 100%;
+}
+
+.filter-row nz-form-item {
+  margin-right: 20px; /* Adjust spacing between items */
+  flex: 1;
+}
+
+.filter-row nz-form-item:last-child {
+  margin-right: 0; /* Remove margin from the last item */
+}
+
+.filter-select-dropdown {
+  margin: 10px;
+  width: 100%;
+}
+
+.filter-select-dropdown nz-form-item {
+  margin-left: 0; /* Reset margin-left */
+}
+
+.filter-select-dropdown nz-form-control {
+  width: 100%;
+}
+
+.filterBtn {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  background-color: #188ee9;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-left: auto; /* Align button to the right */
+}
+
+.filterBtn:hover {
+  background-color: #1469a6;
+}
+
+.filterBtn:active {
+  background-color: #0f4d7f;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .car {
+    width: 100%;
+    margin: 10px;
+  }
+  .car-image {
+    width: 100%;
+  }
+  .car-image img {
+    width: 100%;
+  }
+  .car-details {
+    width: 100%;
+    padding-left: 0;
+  }
+  .dashboard-filter {
+    width: 100%;
+  }
+  .filter-grid {
+    flex-direction: column;
+  }
+  .filter-select-dropdown {
+    margin: 10px 0;
+  }
+  .filterBtn {
+    margin-left: 0;
+  }
+  .filter-row {
+    flex-direction: column; /* Stack items vertically on smaller screens */
+  }
 }

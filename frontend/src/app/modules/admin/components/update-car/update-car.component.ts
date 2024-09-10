@@ -43,7 +43,7 @@ export class UdateCarComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private message: NzMessageService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
   ) {}
   ngOnInit(): void {
     this.updateForm = this.fb.group({
@@ -96,7 +96,7 @@ export class UdateCarComponent implements OnInit {
       (error) => {
         this.isSpinning = false;
         this.message.error('Error while updating car', { nzDuration: 5000 });
-      }
+      },
     );
   }
 

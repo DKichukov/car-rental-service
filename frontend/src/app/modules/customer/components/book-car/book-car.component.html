@@ -12,20 +12,70 @@
           <h5>
             Price : <b>${{ car.price }}</b> - Color: <b>{{ car.color }}</b> -
             Transmission : <b>{{ car.transmission }}</b> - Type :
-            <b>{{ car.type }}</b> - Year: <b>{{ car.year | date : "yyyy" }}</b>
+            <b>{{ car.type }}</b> - Year: <b>{{ car.year | date: "yyyy" }}</b>
           </h5>
-        </div>
-        <div class="book-button">
-          <button
-            nzSize="small"
-            nz-button
-            nzType="primary"
-            [routerLink]="['/customer/book', car.id]"
-          >
-            Book
-          </button>
         </div>
       </div>
     </div>
+  </div>
+
+  <nz-spin
+    [nzSpinning]="isSpinning"
+    [nzSize]="'large'"
+    nzTip="Working..."
+    style="margin-top: 50px"
+  ></nz-spin>
+  <div class="dashboard-filter">
+    <form [formGroup]="validateForm">
+      <div class="filter-grid">
+        <div class="filter-select-dropdown filter-fields-width">
+          <div class="date-fields-container">
+            <nz-form-item>
+              <nz-form-label [nzSpan]="0" nzFor="fromDate"
+                >From Date</nz-form-label
+              >
+              <nz-form-control [nzSpan]="0">
+                <nz-date-picker
+                  formControlName="fromDate"
+                  style="width: 100%"
+                  nzPlaceHolder="From Date"
+                  name="From Date"
+                  [nzFormat]="dateFormat"
+                  id="fromDate"
+                >
+                </nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+              <nz-form-label [nzSpan]="0" nzFor="toDate">To Date</nz-form-label>
+              <nz-form-control [nzSpan]="0">
+                <nz-date-picker
+                  formControlName="toDate"
+                  style="width: 100%"
+                  nzPlaceHolder="To Date"
+                  name="To Date"
+                  [nzFormat]="dateFormat"
+                  id="toDate"
+                >
+                </nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+
+          <div class="filter-select-dropdown filter-fields-width">
+            <button
+              class="filterBtn"
+              type="button"
+              nz-button
+              nzType="primary"
+              (click)="bookCar(validateForm.value)"
+            >
+              Book Car
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
   </div>
 </div>
