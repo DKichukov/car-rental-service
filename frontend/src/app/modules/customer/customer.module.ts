@@ -6,9 +6,14 @@ import { CustomerDashboardComponent } from './components/customer-dashboard/cust
 import { BookCarComponent } from './components/book-car/book-car.component';
 import { NgZorroImportsModule } from 'src/app/ngZorroImportsModule';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MyBookingsComponent } from './components/my-bookings/my-bookings.component';
 
 @NgModule({
-  declarations: [CustomerDashboardComponent, BookCarComponent],
+  declarations: [
+    CustomerDashboardComponent,
+    BookCarComponent,
+    MyBookingsComponent,
+  ],
   imports: [
     CommonModule,
     CustomerRoutingModule,

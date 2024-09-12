@@ -9,9 +9,11 @@ public class BookACarDto {
   private Integer id;
   private Date fromDate;
   private Date toDate;
-  private Integer days;
+  private Long days;
   private Long price;
   private BookCarStatus bookCarStatus;
   private Integer userId;
   private Integer carId;
+  private String username;
+  private String email;
 }

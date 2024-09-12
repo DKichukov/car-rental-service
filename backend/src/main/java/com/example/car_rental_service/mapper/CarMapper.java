@@ -4,7 +4,10 @@ import com.example.car_rental_service.dto.CarDto;
 import com.example.car_rental_service.entity.Car;
 import java.io.IOException;
 
-public class CarMapper {
+public final class CarMapper {
+
+  private CarMapper() {
+  }
 
   public static Car toEntity(CarDto carDto) throws IOException {
     Car car = new Car();

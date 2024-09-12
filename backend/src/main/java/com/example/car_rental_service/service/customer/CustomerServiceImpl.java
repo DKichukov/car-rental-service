@@ -6,6 +6,7 @@ import com.example.car_rental_service.entity.BookACar;
 import com.example.car_rental_service.entity.Car;
 import com.example.car_rental_service.entity.User;
 import com.example.car_rental_service.enums.BookCarStatus;
+import com.example.car_rental_service.mapper.BookACarMapper;
 import com.example.car_rental_service.mapper.CarMapper;
 import com.example.car_rental_service.repository.BookACarRepository;
 import com.example.car_rental_service.repository.CarRepository;
@@ -38,11 +39,13 @@ public class CustomerServiceImpl implements CustomerService {
       BookACar bookACar = new BookACar();
       Car existingCar = optionalCar.get();
       bookACar.setUser(optionalUser.get());
+      bookACar.setFromDate(bookACarDto.getFromDate());
+      bookACar.setToDate(bookACarDto.getToDate());
       bookACar.setCar(existingCar);
       bookACar.setBookCarStatus(BookCarStatus.PENDING);
       long diffInMilliSeconds =
           bookACarDto.getToDate().getTime() - bookACarDto.getFromDate().getTime();
-      long days = TimeUnit.MICROSECONDS.toDays(diffInMilliSeconds);
+      long days = TimeUnit.MILLISECONDS.toDays(diffInMilliSeconds);
       bookACar.setDays(days);
       bookACar.setPrice(existingCar.getPrice() * days);
       bookACarRepository.save(bookACar);
@@ -56,4 +59,10 @@ public class CustomerServiceImpl implements CustomerService {
     Optional<Car> optionalCar = carRepository.findById(id);
     return optionalCar.map(CarMapper::toDto).orElse(null);
   }
+
+  @Override
+  public List<BookACarDto> getBookingsByUserId(Integer userId) {
+    return bookACarRepository.findAllByUserId(userId).stream().map(BookACarMapper::toDto).toList();
+  }
 }
+

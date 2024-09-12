@@ -11,5 +11,6 @@ public interface CustomerService {
   boolean bookACar(BookACarDto bookACarDto);
 
   CarDto getCarById(Integer id);
-  
+
+  List<BookACarDto> getBookingsByUserId(Integer userId);
 }

@@ -4,15 +4,18 @@ import com.example.car_rental_service.dto.SignupRequest;
 import com.example.car_rental_service.entity.User;
 import com.example.car_rental_service.enums.UserRole;
 
-public class UserMapper {
+public final class UserMapper {
 
-    public static User toUser(SignupRequest signupRequest,UserRole userRole) {
-        User user = new User();
-        user.setEmail(signupRequest.email());
-        user.setName(signupRequest.name());
-        user.setPassword(signupRequest.password());
-        user.setUserRole(userRole);
+  private UserMapper() {
+  }
 
-        return user;
-    }
+  public static User toUser(SignupRequest signupRequest, UserRole userRole) {
+    User user = new User();
+    user.setEmail(signupRequest.email());
+    user.setName(signupRequest.name());
+    user.setPassword(signupRequest.password());
+    user.setUserRole(userRole);
+
+    return user;
+  }
 }

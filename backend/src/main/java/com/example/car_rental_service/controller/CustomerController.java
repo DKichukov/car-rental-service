@@ -44,4 +44,9 @@ public class CustomerController {
     }
     return ResponseEntity.ok(carDto);
   }
+
+  @GetMapping("/car/bookings/{userId}")
+  public ResponseEntity<List<BookACarDto>> getBookingsByUserId(@PathVariable Integer userId) {
+    return ResponseEntity.ok(customerService.getBookingsByUserId(userId));
+  }
 }

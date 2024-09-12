@@ -29,6 +29,15 @@ export class CustomerService {
     });
   }
 
+  getBookingsByUserId(): Observable<any> {
+    return this.http.get(
+      BASE_URL + '/api/customer/car/bookings/' + StorageService.getUserId(),
+      {
+        headers: this.createAuthorizationHeader(),
+      },
+    );
+  }
+
   createAuthorizationHeader(): HttpHeaders {
     let autHeaders: HttpHeaders = new HttpHeaders();
     return autHeaders.set(

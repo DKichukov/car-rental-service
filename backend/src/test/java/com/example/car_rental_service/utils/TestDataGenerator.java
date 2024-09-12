@@ -4,6 +4,7 @@ import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
 import com.example.car_rental_service.enums.BookCarStatus;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class TestDataGenerator {
 
@@ -31,12 +32,22 @@ public class TestDataGenerator {
     bookACarDto.setId(1);
     bookACarDto.setFromDate(new Date());
     bookACarDto.setToDate(new Date(System.currentTimeMillis() + 86400000));
-    bookACarDto.setDays(1);
+    bookACarDto.setDays(1L);
     bookACarDto.setPrice(100L);
     bookACarDto.setBookCarStatus(BookCarStatus.PENDING);
     bookACarDto.setUserId(userId);
     bookACarDto.setCarId(carId);
 
+    return bookACarDto;
+  }
+
+  public static BookACarDto createBookACarDto(Integer userId, Integer carId) {
+    BookACarDto bookACarDto = new BookACarDto();
+    bookACarDto.setUserId(userId);
+    bookACarDto.setCarId(carId);
+    bookACarDto.setBookCarStatus(BookCarStatus.PENDING);
+    bookACarDto.setFromDate(new Date());
+    bookACarDto.setToDate(new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1)));
     return bookACarDto;
   }
 }

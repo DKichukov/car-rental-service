@@ -7,17 +7,23 @@ import static com.example.car_rental_service.utils.AuthUtil.encodePassword;
 import static com.example.car_rental_service.utils.AuthUtil.extractJwtToken;
 import static com.example.car_rental_service.utils.JsonUtil.convertToJson;
 import static com.example.car_rental_service.utils.JsonUtil.parseResponseBody;
+import static com.example.car_rental_service.utils.JsonUtil.parseResponseBodyToList;
+import static com.example.car_rental_service.utils.TestDataGenerator.createBookACarDto;
 import static com.example.car_rental_service.utils.TestDataGenerator.createCarDto;
 import static com.example.car_rental_service.utils.TestDataGenerator.createDummyBookACarDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.car_rental_service.config.TestcontainersConfig;
 import com.example.car_rental_service.dto.AuthenticationRequest;
 import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
+import com.example.car_rental_service.entity.BookACar;
 import com.example.car_rental_service.entity.Car;
 import com.example.car_rental_service.entity.User;
+import com.example.car_rental_service.enums.BookCarStatus;
 import com.example.car_rental_service.enums.UserRole;
 import com.example.car_rental_service.repository.BookACarRepository;
 import com.example.car_rental_service.repository.CarRepository;
@@ -174,6 +180,60 @@ class CustomerControllerTest {
     assertEquals(carDto.getTransmission(), retrievedCarDto.getTransmission());
     assertEquals(carDto.getPrice(), retrievedCarDto.getPrice());
     assertEquals(carDto.getDescription(), retrievedCarDto.getDescription());
+  }
+
+  @Test
+  void testGetBookingsByUserIdWithValidCustomerCredentials() throws Exception {
+    User customerUser =
+        createUser(CUSTOMER_NAME, CUSTOMER_TEST_EMAIL, encodePassword(CUSTOMER_RAW_PASSWORD),
+            UserRole.CUSTOMER);
+    userRepository.save(customerUser);
+
+    CarDto carDto = createCarDto();
+    Car savedCar = carRepository.save(toEntity(carDto));
+
+    BookACarDto bookACarDto = createBookACarDto(customerUser.getId(), savedCar.getId());
+    createAndSaveBookACarEntity(bookACarDto, customerUser, savedCar);
+
+    AuthenticationRequest authenticationRequest =
+        createAuthenticationRequest(CUSTOMER_TEST_EMAIL, CUSTOMER_RAW_PASSWORD);
+    String authRequestBody = convertToJson(authenticationRequest);
+
+    MvcResult loginResult = mockMvc.perform(
+        MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
+            .content(authRequestBody)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    String jwtToken = extractJwtToken(loginResult);
+
+    MvcResult bookingsResult = mockMvc.perform(
+            MockMvcRequestBuilders.get(CUSTOMER_URL + "/car/bookings/{userId}", customerUser.getId())
+                .header("Authorization", "Bearer " + jwtToken))
+        .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    List<BookACarDto> retrievedBookings =
+        parseResponseBodyToList(bookingsResult, BookACarDto.class);
+
+    assertNotNull(retrievedBookings);
+    assertFalse(retrievedBookings.isEmpty());
+    assertEquals(1, retrievedBookings.size());
+
+    BookACarDto retrievedBooking = retrievedBookings.getFirst();
+    assertEquals(bookACarDto.getFromDate(), retrievedBooking.getFromDate());
+    assertEquals(bookACarDto.getToDate(), retrievedBooking.getToDate());
+    assertEquals(bookACarDto.getCarId(), retrievedBooking.getCarId());
+    assertEquals(bookACarDto.getUserId(), retrievedBooking.getUserId());
+    assertEquals(BookCarStatus.PENDING, retrievedBooking.getBookCarStatus());
+  }
+
+  private void createAndSaveBookACarEntity(BookACarDto bookACarDto, User customerUser,
+      Car savedCar) {
+    BookACar saveBooking = new BookACar();
+    saveBooking.setToDate(bookACarDto.getToDate());
+    saveBooking.setFromDate(bookACarDto.getFromDate());
+    saveBooking.setBookCarStatus(bookACarDto.getBookCarStatus());
+    saveBooking.setUser(customerUser);
+    saveBooking.setCar(savedCar);
+    bookingRepository.save(saveBooking);
   }
 
   private void createCustomerUser() {
