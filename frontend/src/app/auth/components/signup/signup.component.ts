@@ -39,9 +39,7 @@ export class SignupComponent implements OnInit {
   };
 
   register() {
-    console.log(this.signupForm.value);
     this.authService.register(this.signupForm.value).subscribe((res) => {
-      console.log(res);
       if (res.id != null) {
         this.message.success('Signup successfully', { nzDuration: 5000 });
         this.router.navigateByUrl('/login');

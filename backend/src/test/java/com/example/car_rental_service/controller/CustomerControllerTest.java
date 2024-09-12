@@ -8,6 +8,7 @@ import static com.example.car_rental_service.utils.AuthUtil.extractJwtToken;
 import static com.example.car_rental_service.utils.JsonUtil.convertToJson;
 import static com.example.car_rental_service.utils.JsonUtil.parseResponseBody;
 import static com.example.car_rental_service.utils.JsonUtil.parseResponseBodyToList;
+import static com.example.car_rental_service.utils.TestDataGenerator.createAndSaveBookACarEntity;
 import static com.example.car_rental_service.utils.TestDataGenerator.createBookACarDto;
 import static com.example.car_rental_service.utils.TestDataGenerator.createCarDto;
 import static com.example.car_rental_service.utils.TestDataGenerator.createDummyBookACarDto;
@@ -193,7 +194,8 @@ class CustomerControllerTest {
     Car savedCar = carRepository.save(toEntity(carDto));
 
     BookACarDto bookACarDto = createBookACarDto(customerUser.getId(), savedCar.getId());
-    createAndSaveBookACarEntity(bookACarDto, customerUser, savedCar);
+    BookACar saveBooking = createAndSaveBookACarEntity(bookACarDto, customerUser, savedCar);
+    bookingRepository.save(saveBooking);
 
     AuthenticationRequest authenticationRequest =
         createAuthenticationRequest(CUSTOMER_TEST_EMAIL, CUSTOMER_RAW_PASSWORD);
@@ -225,16 +227,7 @@ class CustomerControllerTest {
     assertEquals(BookCarStatus.PENDING, retrievedBooking.getBookCarStatus());
   }
 
-  private void createAndSaveBookACarEntity(BookACarDto bookACarDto, User customerUser,
-      Car savedCar) {
-    BookACar saveBooking = new BookACar();
-    saveBooking.setToDate(bookACarDto.getToDate());
-    saveBooking.setFromDate(bookACarDto.getFromDate());
-    saveBooking.setBookCarStatus(bookACarDto.getBookCarStatus());
-    saveBooking.setUser(customerUser);
-    saveBooking.setCar(savedCar);
-    bookingRepository.save(saveBooking);
-  }
+
 
   private void createCustomerUser() {
     User customerUser =

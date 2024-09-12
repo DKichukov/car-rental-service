@@ -2,6 +2,9 @@ package com.example.car_rental_service.utils;
 
 import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
+import com.example.car_rental_service.entity.BookACar;
+import com.example.car_rental_service.entity.Car;
+import com.example.car_rental_service.entity.User;
 import com.example.car_rental_service.enums.BookCarStatus;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -49,5 +52,16 @@ public class TestDataGenerator {
     bookACarDto.setFromDate(new Date());
     bookACarDto.setToDate(new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1)));
     return bookACarDto;
+  }
+
+  public static BookACar createAndSaveBookACarEntity(BookACarDto bookACarDto, User customerUser,
+      Car savedCar) {
+    BookACar saveBooking = new BookACar();
+    saveBooking.setToDate(bookACarDto.getToDate());
+    saveBooking.setFromDate(bookACarDto.getFromDate());
+    saveBooking.setBookCarStatus(bookACarDto.getBookCarStatus());
+    saveBooking.setUser(customerUser);
+    saveBooking.setCar(savedCar);
+    return saveBooking;
   }
 }

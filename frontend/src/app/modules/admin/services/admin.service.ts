@@ -10,10 +10,7 @@ const BASE_URL = ['http://localhost:8080'];
   providedIn: 'root',
 })
 export class AdminService {
-  constructor(
-    private http: HttpClient,
-    private message: NzMessageService,
-  ) {}
+  constructor(private http: HttpClient, private message: NzMessageService) {}
 
   postCar(carDto: any): Observable<any> {
     const headers = this.createAuthorizationHeader();
@@ -27,7 +24,7 @@ export class AdminService {
     let autHeaders: HttpHeaders = new HttpHeaders();
     return autHeaders.set(
       'Authorization',
-      'Bearer ' + StorageService.getToken(),
+      'Bearer ' + StorageService.getToken()
     );
   }
 
@@ -36,11 +33,13 @@ export class AdminService {
       headers: this.createAuthorizationHeader(),
     });
   }
+
   deleteCar(id: number): Observable<any> {
     return this.http.delete(BASE_URL + '/api/admin/car/' + id, {
       headers: this.createAuthorizationHeader(),
     });
   }
+
   getCarById(id: number): Observable<any> {
     return this.http.get(BASE_URL + '/api/admin/car/' + id, {
       headers: this.createAuthorizationHeader(),
@@ -49,6 +48,12 @@ export class AdminService {
 
   updateCar(carId: number, carDto: any): Observable<any> {
     return this.http.put(BASE_URL + '/api/admin/car/' + carId, carDto, {
+      headers: this.createAuthorizationHeader(),
+    });
+  }
+
+  getCarBookings(): Observable<any> {
+    return this.http.get(BASE_URL + '/api/admin/car/bookings', {
       headers: this.createAuthorizationHeader(),
     });
   }

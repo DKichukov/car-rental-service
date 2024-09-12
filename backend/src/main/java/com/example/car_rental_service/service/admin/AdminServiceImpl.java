@@ -2,9 +2,12 @@ package com.example.car_rental_service.service.admin;
 
 import static com.example.car_rental_service.mapper.CarMapper.toEntity;
 
+import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
 import com.example.car_rental_service.entity.Car;
+import com.example.car_rental_service.mapper.BookACarMapper;
 import com.example.car_rental_service.mapper.CarMapper;
+import com.example.car_rental_service.repository.BookACarRepository;
 import com.example.car_rental_service.repository.CarRepository;
 import java.io.IOException;
 import java.util.List;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class AdminServiceImpl implements AdminService {
 
   private final CarRepository carRepository;
+  private final BookACarRepository bookACarRepository;
 
   @Override
   public boolean postCar(CarDto carDto) {
@@ -69,5 +73,10 @@ public class AdminServiceImpl implements AdminService {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public List<BookACarDto> getBookings() {
+    return bookACarRepository.findAll().stream().map(BookACarMapper::toDto).toList();
   }
 }

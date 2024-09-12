@@ -29,9 +29,7 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-    console.log(this.loginFrom.value);
     this.authService.login(this.loginFrom.value).subscribe((data) => {
-      console.log(data);
       if (data.userId != null) {
         const user = {
           id: data.userId,

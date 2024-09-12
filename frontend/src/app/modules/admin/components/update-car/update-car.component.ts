@@ -85,8 +85,6 @@ export class UdateCarComponent implements OnInit {
     formData.append('description', this.updateForm.get('description')?.value);
     formData.append('price', this.updateForm.get('price')?.value);
 
-    console.log(formData);
-
     this.adminService.updateCar(this.carId, formData).subscribe(
       (res) => {
         this.isSpinning = false;

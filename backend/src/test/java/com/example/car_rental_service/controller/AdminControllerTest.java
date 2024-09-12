@@ -7,6 +7,9 @@ import static com.example.car_rental_service.utils.AuthUtil.encodePassword;
 import static com.example.car_rental_service.utils.AuthUtil.extractJwtToken;
 import static com.example.car_rental_service.utils.JsonUtil.convertToJson;
 import static com.example.car_rental_service.utils.JsonUtil.parseResponseBody;
+import static com.example.car_rental_service.utils.JsonUtil.parseResponseBodyToList;
+import static com.example.car_rental_service.utils.TestDataGenerator.createAndSaveBookACarEntity;
+import static com.example.car_rental_service.utils.TestDataGenerator.createBookACarDto;
 import static com.example.car_rental_service.utils.TestDataGenerator.createCarDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -14,10 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.car_rental_service.config.TestcontainersConfig;
 import com.example.car_rental_service.dto.AuthenticationRequest;
+import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
+import com.example.car_rental_service.entity.BookACar;
 import com.example.car_rental_service.entity.Car;
 import com.example.car_rental_service.entity.User;
+import com.example.car_rental_service.enums.BookCarStatus;
 import com.example.car_rental_service.enums.UserRole;
+import com.example.car_rental_service.repository.BookACarRepository;
 import com.example.car_rental_service.repository.CarRepository;
 import com.example.car_rental_service.repository.UserRepository;
 import jakarta.inject.Inject;
@@ -37,7 +44,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 
 @Testcontainers
 @AutoConfigureMockMvc
@@ -59,6 +65,8 @@ class AdminControllerTest {
   UserRepository userRepository;
   @Inject
   CarRepository carRepository;
+  @Autowired
+  BookACarRepository bookingRepository;
   @Autowired
   private PostgreSQLContainer<?> postgresContainer;
 
@@ -214,14 +222,50 @@ class AdminControllerTest {
     assertEquals(updatedCarDto.getName(), updatedCar.getName());
   }
 
-  private void createAdminUser() {
-    User adminUser = createUser(ADMIN_NAME, ADMIN_TEST_EMAIL, encodePassword(ADMIN_RAW_PASSWORD),
-        UserRole.ADMIN);
-    userRepository.save(adminUser);
+  @Test
+  void testGetBookingsWithValidAdminCredentials() throws Exception {
+    User adminUser = createAdminUser();
+
+    CarDto carDto = createCarDto();
+    Car savedCar = carRepository.save(toEntity(carDto));
+
+    BookACarDto bookACarDto = createBookACarDto(adminUser.getId(), savedCar.getId());
+    BookACar savedBooking = createAndSaveBookACarEntity(bookACarDto, adminUser, savedCar);
+    bookingRepository.save(savedBooking);
+
+    String authRequestBody = createAuthRequest();
+
+    MvcResult loginResult = mockMvc.perform(
+        MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
+            .content(authRequestBody)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    String jwtToken = extractJwtToken(loginResult);
+
+    MvcResult bookingsResult = mockMvc.perform(
+            MockMvcRequestBuilders.get(ADMIN_URL + "/car/bookings")
+                .header("Authorization", "Bearer " + jwtToken))
+        .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    List<BookACarDto> retrievedBookings =
+        parseResponseBodyToList(bookingsResult, BookACarDto.class);
+
+    assertEquals(1, retrievedBookings.size());
+
+    BookACarDto retrievedBooking = retrievedBookings.getFirst();
+    assertEquals(bookACarDto.getFromDate(), retrievedBooking.getFromDate());
+    assertEquals(bookACarDto.getToDate(), retrievedBooking.getToDate());
+    assertEquals(bookACarDto.getCarId(), retrievedBooking.getCarId());
+    assertEquals(bookACarDto.getUserId(), retrievedBooking.getUserId());
+    assertEquals(BookCarStatus.PENDING, retrievedBooking.getBookCarStatus());
   }
 
-  private String createAuthRequest()
-      throws JsonProcessingException, com.fasterxml.jackson.core.JsonProcessingException {
+  private User createAdminUser() {
+    User adminUser = createUser(ADMIN_NAME, ADMIN_TEST_EMAIL, encodePassword(ADMIN_RAW_PASSWORD),
+        UserRole.ADMIN);
+    return userRepository.save(adminUser);
+  }
+
+  private String createAuthRequest() throws com.fasterxml.jackson.core.JsonProcessingException {
     AuthenticationRequest authenticationRequest =
         createAuthenticationRequest(ADMIN_TEST_EMAIL, ADMIN_RAW_PASSWORD);
     return convertToJson(authenticationRequest);

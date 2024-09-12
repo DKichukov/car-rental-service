@@ -21,7 +21,6 @@ export class AdminDashboardComponent implements OnInit {
 
   getAllCars(): void {
     this.adminService.getAllCars().subscribe((data) => {
-      console.log(data);
       data.forEach((element: any) => {
         element.processedImg =
           'data:image/jpeg;base64,' + element.returnedImage;
