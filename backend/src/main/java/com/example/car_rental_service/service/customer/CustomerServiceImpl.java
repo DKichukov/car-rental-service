@@ -2,6 +2,8 @@ package com.example.car_rental_service.service.customer;
 
 import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
+import com.example.car_rental_service.dto.CarDtoList;
+import com.example.car_rental_service.dto.SearchCarDto;
 import com.example.car_rental_service.entity.BookACar;
 import com.example.car_rental_service.entity.Car;
 import com.example.car_rental_service.entity.User;
@@ -15,6 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -63,6 +67,25 @@ public class CustomerServiceImpl implements CustomerService {
   @Override
   public List<BookACarDto> getBookingsByUserId(Integer userId) {
     return bookACarRepository.findAllByUserId(userId).stream().map(BookACarMapper::toDto).toList();
+  }
+
+  @Override
+  public CarDtoList searchCar(SearchCarDto searchCarDto) {
+    Car car = new Car();
+    car.setBrand(searchCarDto.getBrand());
+    car.setType(searchCarDto.getType());
+    car.setTransmission(searchCarDto.getTransmission());
+    car.setColor(searchCarDto.getColor());
+    ExampleMatcher matcher =
+        ExampleMatcher.matching().withMatcher("brand", match -> match.ignoreCase().startsWith())
+            .withMatcher("type", match -> match.ignoreCase().startsWith())
+            .withMatcher("transmission", match -> match.ignoreCase().startsWith())
+            .withMatcher("color", match -> match.ignoreCase().startsWith());
+    Example<Car> carExample = Example.of(car, matcher);
+    List<Car> cars = carRepository.findAll(carExample);
+    CarDtoList carDtoList = new CarDtoList();
+    carDtoList.setCarDtoList(cars.stream().map(CarMapper::toDto).toList());
+    return carDtoList;
   }
 }
 

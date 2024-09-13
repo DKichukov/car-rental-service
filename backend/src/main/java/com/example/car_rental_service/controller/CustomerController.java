@@ -2,6 +2,7 @@ package com.example.car_rental_service.controller;
 
 import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
+import com.example.car_rental_service.dto.SearchCarDto;
 import com.example.car_rental_service.service.customer.CustomerService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -49,4 +50,10 @@ public class CustomerController {
   public ResponseEntity<List<BookACarDto>> getBookingsByUserId(@PathVariable Integer userId) {
     return ResponseEntity.ok(customerService.getBookingsByUserId(userId));
   }
+
+  @PostMapping("/car/search")
+  public ResponseEntity<?> searchCar(@RequestBody SearchCarDto searchCarDto) {
+    return ResponseEntity.ok(customerService.searchCar(searchCarDto));
+  }
+
 }

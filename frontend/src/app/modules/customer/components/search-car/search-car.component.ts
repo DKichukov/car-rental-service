@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { AdminService } from '../../services/admin.service';
+import { CustomerService } from '../../service/customer.service';
 
 @Component({
   selector: 'app-search-car',
   templateUrl: './search-car.component.html',
-  styleUrls: ['./search-car.component.scss'],
+  styleUrls: ['./search-car.component.scss']
 })
 export class SearchCarComponent {
   isSpinning: boolean = false;
@@ -30,7 +30,7 @@ export class SearchCarComponent {
 
   cars: any = [];
 
-  constructor(private fb: FormBuilder, private adminService: AdminService) {
+  constructor(private fb: FormBuilder, private customerServce: CustomerService) {
     this.searchCarForm = this.fb.group({
       brand: [''],
       type: [''],
@@ -41,7 +41,7 @@ export class SearchCarComponent {
 
   searchCar() {
     this.isSpinning = true;
-    this.adminService.searchCar(this.searchCarForm.value).subscribe((res) => {
+    this.customerServce.searchCar(this.searchCarForm.value).subscribe((res) => {
       this.isSpinning = false;
       res.carDtoList.forEach((element: any) => {
         element.processedImg =

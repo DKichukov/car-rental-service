@@ -8,6 +8,7 @@ import { NgZorroImportsModule } from 'src/app/ngZorroImportsModule';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MyBookingsComponent } from './components/my-bookings/my-bookings.component';
 import { GetBookingsComponent } from '../admin/components/get-bookings/get-bookings.component';
+import { SearchCarComponent } from './components/search-car/search-car.component';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { GetBookingsComponent } from '../admin/components/get-bookings/get-booki
     BookCarComponent,
     MyBookingsComponent,
     GetBookingsComponent,
+    SearchCarComponent,
   ],
   imports: [
     CommonModule,

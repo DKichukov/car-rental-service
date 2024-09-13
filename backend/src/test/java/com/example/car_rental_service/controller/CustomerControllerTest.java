@@ -12,6 +12,7 @@ import static com.example.car_rental_service.utils.TestDataGenerator.createBookA
 import static com.example.car_rental_service.utils.TestDataGenerator.createBookACarEntity;
 import static com.example.car_rental_service.utils.TestDataGenerator.createCarDto;
 import static com.example.car_rental_service.utils.TestDataGenerator.createDummyBookACarDto;
+import static com.example.car_rental_service.utils.TestDataGenerator.createSearchCarDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -21,6 +22,8 @@ import com.example.car_rental_service.config.TestcontainersConfig;
 import com.example.car_rental_service.dto.AuthenticationRequest;
 import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
+import com.example.car_rental_service.dto.CarDtoList;
+import com.example.car_rental_service.dto.SearchCarDto;
 import com.example.car_rental_service.entity.BookACar;
 import com.example.car_rental_service.entity.Car;
 import com.example.car_rental_service.entity.User;
@@ -45,7 +48,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 
 @Testcontainers
 @AutoConfigureMockMvc
@@ -56,6 +58,11 @@ class CustomerControllerTest {
   private static final String CUSTOMER_NAME = "Customer";
   private static final String CUSTOMER_TEST_EMAIL = "customer@test.com";
   private static final String CUSTOMER_RAW_PASSWORD = "customer";
+
+  private static final String ADMIN_NAME = "Admin";
+  private static final String ADMIN_TEST_EMAIL = "admin@test.com";
+  private static final String ADMIN_RAW_PASSWORD = "admin";
+
 
   private static final String AUTH_URL = "/api/auth";
   private static final String CUSTOMER_URL = "/api/customer";
@@ -227,7 +234,38 @@ class CustomerControllerTest {
     assertEquals(BookCarStatus.PENDING, retrievedBooking.getBookCarStatus());
   }
 
+  @Test
+  void testSearchCarWithValidAdminCredentials() throws Exception {
+    createCustomerUser();
+    CarDto carDto = createCarDto();
+    carRepository.save(toEntity(carDto));
 
+    String authRequestBody = createAuthRequest();
+
+
+    carRepository.save(toEntity(carDto));
+    MvcResult loginResult = mockMvc.perform(
+        MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
+            .content(authRequestBody)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    String jwtToken = extractJwtToken(loginResult);
+    String carRequestBody = convertToJson(carDto);
+    carRepository.save(toEntity(carDto));
+
+    SearchCarDto searchCarDto = createSearchCarDto();
+    String searchRequestBody = convertToJson(searchCarDto);
+
+    MvcResult searchResult = mockMvc.perform(
+            MockMvcRequestBuilders.post(CUSTOMER_URL + "/car/search")
+                .contentType(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + jwtToken)
+                .content(searchRequestBody)).andExpect(MockMvcResultMatchers.status().isOk())
+        .andReturn();
+
+    CarDtoList carDtoList = parseResponseBody(searchResult, CarDtoList.class);
+
+    assertNotNull(carDtoList);
+    assertFalse(carDtoList.getCarDtoList().isEmpty());
+  }
 
   private void createCustomerUser() {
     User customerUser =
@@ -236,12 +274,9 @@ class CustomerControllerTest {
     userRepository.save(customerUser);
   }
 
-  private String createAuthRequest()
-      throws JsonProcessingException, com.fasterxml.jackson.core.JsonProcessingException {
+  private String createAuthRequest() throws com.fasterxml.jackson.core.JsonProcessingException {
     AuthenticationRequest authenticationRequest =
         createAuthenticationRequest(CUSTOMER_TEST_EMAIL, CUSTOMER_RAW_PASSWORD);
     return convertToJson(authenticationRequest);
   }
-
-
 }

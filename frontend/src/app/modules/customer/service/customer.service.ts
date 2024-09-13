@@ -45,4 +45,10 @@ export class CustomerService {
       'Bearer ' + StorageService.getToken(),
     );
   }
+  searchCar(searchCarDto: any): Observable<any> {
+    const headers = this.createAuthorizationHeader();
+    return this.http.post(BASE_URL + '/api/customer/car/search', searchCarDto, {
+      headers: this.createAuthorizationHeader(),
+    });
+  }
 }
