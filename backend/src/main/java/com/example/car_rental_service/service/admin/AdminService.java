@@ -2,6 +2,8 @@ package com.example.car_rental_service.service.admin;
 
 import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
+import com.example.car_rental_service.dto.CarDtoList;
+import com.example.car_rental_service.dto.SearchCarDto;
 import java.io.IOException;
 import java.util.List;
 
@@ -20,4 +22,6 @@ public interface AdminService {
   List<BookACarDto> getBookings();
 
   boolean changeBookingStatus(Integer bookingId, String status);
+
+  CarDtoList searchCar(SearchCarDto searchCarDto);
 }

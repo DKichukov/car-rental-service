@@ -11,14 +11,18 @@ import static com.example.car_rental_service.utils.JsonUtil.parseResponseBodyToL
 import static com.example.car_rental_service.utils.TestDataGenerator.createBookACarDto;
 import static com.example.car_rental_service.utils.TestDataGenerator.createBookACarEntity;
 import static com.example.car_rental_service.utils.TestDataGenerator.createCarDto;
+import static com.example.car_rental_service.utils.TestDataGenerator.createSearchCarDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.car_rental_service.config.TestcontainersConfig;
 import com.example.car_rental_service.dto.AuthenticationRequest;
 import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
+import com.example.car_rental_service.dto.CarDtoList;
+import com.example.car_rental_service.dto.SearchCarDto;
 import com.example.car_rental_service.entity.BookACar;
 import com.example.car_rental_service.entity.Car;
 import com.example.car_rental_service.entity.User;
@@ -304,6 +308,38 @@ class AdminControllerTest {
             MockMvcRequestBuilders.get(ADMIN_URL + "/car/booking/{bookingId}/{status}", -1, "Approve")
                 .header("Authorization", "Bearer " + jwtToken))
         .andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
+  }
+
+  @Test
+  void testSearchCarWithValidAdminCredentials() throws Exception {
+    createAdminUser();
+    CarDto carDto = createCarDto();
+    String authRequestBody = createAuthRequest();
+
+    MvcResult loginResult = mockMvc.perform(
+        MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
+            .content(authRequestBody)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    String jwtToken = extractJwtToken(loginResult);
+    String carRequestBody = convertToJson(carDto);
+    carRepository.save(toEntity(carDto));
+
+    mockMvc.perform(
+            MockMvcRequestBuilders.post(ADMIN_URL + "/car").contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + jwtToken).content(carRequestBody))
+        .andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
+
+    SearchCarDto searchCarDto = createSearchCarDto();
+    String searchRequestBody = convertToJson(searchCarDto);
+
+    MvcResult searchResult = mockMvc.perform(MockMvcRequestBuilders.post(ADMIN_URL + "/car/search")
+        .contentType(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + jwtToken)
+        .content(searchRequestBody)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    CarDtoList carDtoList = parseResponseBody(searchResult, CarDtoList.class);
+
+    assertNotNull(carDtoList);
+    assertFalse(carDtoList.getCarDtoList().isEmpty());
   }
 
   private User createAdminUser() {

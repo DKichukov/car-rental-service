@@ -10,3 +10,4 @@ public interface BookACarRepository extends JpaRepository<BookACar, Integer> {
 
   List<BookACar> findAllByUserId(Integer userId);
 }
+

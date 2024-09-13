@@ -14,7 +14,6 @@ export class AdminService {
 
   postCar(carDto: any): Observable<any> {
     const headers = this.createAuthorizationHeader();
-    console.log('Headers:', headers);
     return this.http.post(BASE_URL + '/api/admin/car', carDto, {
       headers: this.createAuthorizationHeader(),
     });
@@ -65,5 +64,12 @@ export class AdminService {
         headers: this.createAuthorizationHeader(),
       }
     );
+  }
+
+  seearchCar(searchCarDto: any): Observable<any> {
+    const headers = this.createAuthorizationHeader();
+    return this.http.post(BASE_URL + '/api/admin/car/search', searchCarDto, {
+      headers: this.createAuthorizationHeader(),
+    });
   }
 }

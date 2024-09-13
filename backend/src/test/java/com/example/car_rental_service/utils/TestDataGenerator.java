@@ -2,6 +2,7 @@ package com.example.car_rental_service.utils;
 
 import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
+import com.example.car_rental_service.dto.SearchCarDto;
 import com.example.car_rental_service.entity.BookACar;
 import com.example.car_rental_service.entity.Car;
 import com.example.car_rental_service.entity.User;
@@ -64,4 +65,14 @@ public class TestDataGenerator {
     saveBooking.setCar(savedCar);
     return saveBooking;
   }
+
+  public static SearchCarDto createSearchCarDto() {
+    SearchCarDto searchCarDto = new SearchCarDto();
+    searchCarDto.setBrand("bwm");
+    searchCarDto.setType("type");
+    searchCarDto.setTransmission("transmission");
+    searchCarDto.setColor("white");
+    return searchCarDto;
+  }
+
 }

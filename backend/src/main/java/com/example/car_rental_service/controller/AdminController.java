@@ -2,6 +2,7 @@ package com.example.car_rental_service.controller;
 
 import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
+import com.example.car_rental_service.dto.SearchCarDto;
 import com.example.car_rental_service.service.admin.AdminService;
 import java.io.IOException;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -77,5 +79,10 @@ public class AdminController {
       return ResponseEntity.ok().build();
     }
     return ResponseEntity.notFound().build();
+  }
+
+  @PostMapping("/car/search")
+  public ResponseEntity<?> searchCar(@RequestBody SearchCarDto searchCarDto) {
+    return ResponseEntity.ok(adminService.searchCar(searchCarDto));
   }
 }
