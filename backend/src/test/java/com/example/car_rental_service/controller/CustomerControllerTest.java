@@ -8,8 +8,8 @@ import static com.example.car_rental_service.utils.AuthUtil.extractJwtToken;
 import static com.example.car_rental_service.utils.JsonUtil.convertToJson;
 import static com.example.car_rental_service.utils.JsonUtil.parseResponseBody;
 import static com.example.car_rental_service.utils.JsonUtil.parseResponseBodyToList;
-import static com.example.car_rental_service.utils.TestDataGenerator.createAndSaveBookACarEntity;
 import static com.example.car_rental_service.utils.TestDataGenerator.createBookACarDto;
+import static com.example.car_rental_service.utils.TestDataGenerator.createBookACarEntity;
 import static com.example.car_rental_service.utils.TestDataGenerator.createCarDto;
 import static com.example.car_rental_service.utils.TestDataGenerator.createDummyBookACarDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -194,7 +194,7 @@ class CustomerControllerTest {
     Car savedCar = carRepository.save(toEntity(carDto));
 
     BookACarDto bookACarDto = createBookACarDto(customerUser.getId(), savedCar.getId());
-    BookACar saveBooking = createAndSaveBookACarEntity(bookACarDto, customerUser, savedCar);
+    BookACar saveBooking = createBookACarEntity(bookACarDto, customerUser, savedCar);
     bookingRepository.save(saveBooking);
 
     AuthenticationRequest authenticationRequest =

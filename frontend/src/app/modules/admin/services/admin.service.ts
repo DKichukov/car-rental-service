@@ -57,4 +57,13 @@ export class AdminService {
       headers: this.createAuthorizationHeader(),
     });
   }
+
+  changeBookingStatus(bookingId: number, status: string): Observable<any> {
+    return this.http.get(
+      `${BASE_URL}/api/admin/car/booking/${bookingId}/${status}`,
+      {
+        headers: this.createAuthorizationHeader(),
+      }
+    );
+  }
 }

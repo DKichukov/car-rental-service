@@ -4,7 +4,9 @@ import static com.example.car_rental_service.mapper.CarMapper.toEntity;
 
 import com.example.car_rental_service.dto.BookACarDto;
 import com.example.car_rental_service.dto.CarDto;
+import com.example.car_rental_service.entity.BookACar;
 import com.example.car_rental_service.entity.Car;
+import com.example.car_rental_service.enums.BookCarStatus;
 import com.example.car_rental_service.mapper.BookACarMapper;
 import com.example.car_rental_service.mapper.CarMapper;
 import com.example.car_rental_service.repository.BookACarRepository;
@@ -78,5 +80,23 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public List<BookACarDto> getBookings() {
     return bookACarRepository.findAll().stream().map(BookACarMapper::toDto).toList();
+  }
+
+  @Override
+  public boolean changeBookingStatus(Integer bookingId, String status) {
+    Optional<BookACar> optionalBookACar = bookACarRepository.findById(bookingId);
+
+    if (optionalBookACar.isPresent()) {
+      BookACar bookACar = optionalBookACar.get();
+
+      if ("Approve".equalsIgnoreCase(status)) {
+        bookACar.setBookCarStatus(BookCarStatus.APPROVED);
+      } else if ("Reject".equalsIgnoreCase(status)) {
+        bookACar.setBookCarStatus(BookCarStatus.REJECTED);
+      }
+      bookACarRepository.save(bookACar);
+      return true;
+    }
+    return false;
   }
 }

@@ -75,7 +75,6 @@ export class PostCarComponent implements OnInit {
         error: (err) => {
           this.isSpinning = false;
           this.message.error('Error while posting car', { nzDuration: 5000 });
-          console.error(err);
         },
       });
     } else {

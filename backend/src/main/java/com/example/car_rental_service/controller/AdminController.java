@@ -68,4 +68,14 @@ public class AdminController {
   public ResponseEntity<List<BookACarDto>> getBookings() {
     return ResponseEntity.ok(adminService.getBookings());
   }
+
+  @GetMapping("/car/booking/{bookingId}/{status}")
+  private ResponseEntity<?> changeBookingStatus(@PathVariable Integer bookingId,
+      @PathVariable String status) {
+    boolean success = adminService.changeBookingStatus(bookingId, status);
+    if (success) {
+      return ResponseEntity.ok().build();
+    }
+    return ResponseEntity.notFound().build();
+  }
 }

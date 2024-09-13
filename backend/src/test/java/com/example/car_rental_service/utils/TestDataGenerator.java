@@ -54,7 +54,7 @@ public class TestDataGenerator {
     return bookACarDto;
   }
 
-  public static BookACar createAndSaveBookACarEntity(BookACarDto bookACarDto, User customerUser,
+  public static BookACar createBookACarEntity(BookACarDto bookACarDto, User customerUser,
       Car savedCar) {
     BookACar saveBooking = new BookACar();
     saveBooking.setToDate(bookACarDto.getToDate());

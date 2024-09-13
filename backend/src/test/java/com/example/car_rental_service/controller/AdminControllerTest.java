@@ -8,8 +8,8 @@ import static com.example.car_rental_service.utils.AuthUtil.extractJwtToken;
 import static com.example.car_rental_service.utils.JsonUtil.convertToJson;
 import static com.example.car_rental_service.utils.JsonUtil.parseResponseBody;
 import static com.example.car_rental_service.utils.JsonUtil.parseResponseBodyToList;
-import static com.example.car_rental_service.utils.TestDataGenerator.createAndSaveBookACarEntity;
 import static com.example.car_rental_service.utils.TestDataGenerator.createBookACarDto;
+import static com.example.car_rental_service.utils.TestDataGenerator.createBookACarEntity;
 import static com.example.car_rental_service.utils.TestDataGenerator.createCarDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -66,7 +66,7 @@ class AdminControllerTest {
   @Inject
   CarRepository carRepository;
   @Autowired
-  BookACarRepository bookingRepository;
+  BookACarRepository bookACarRepository;
   @Autowired
   private PostgreSQLContainer<?> postgresContainer;
 
@@ -230,8 +230,8 @@ class AdminControllerTest {
     Car savedCar = carRepository.save(toEntity(carDto));
 
     BookACarDto bookACarDto = createBookACarDto(adminUser.getId(), savedCar.getId());
-    BookACar savedBooking = createAndSaveBookACarEntity(bookACarDto, adminUser, savedCar);
-    bookingRepository.save(savedBooking);
+    BookACar savedBooking = createBookACarEntity(bookACarDto, adminUser, savedCar);
+    bookACarRepository.save(savedBooking);
 
     String authRequestBody = createAuthRequest();
 
@@ -257,6 +257,53 @@ class AdminControllerTest {
     assertEquals(bookACarDto.getCarId(), retrievedBooking.getCarId());
     assertEquals(bookACarDto.getUserId(), retrievedBooking.getUserId());
     assertEquals(BookCarStatus.PENDING, retrievedBooking.getBookCarStatus());
+  }
+
+  @Test
+  void testChangeBookingStatusWithValidAdminCredentials() throws Exception {
+    User adminUser = createAdminUser();
+
+    CarDto carDto = createCarDto();
+    Car savedCar = carRepository.save(toEntity(carDto));
+
+    BookACarDto bookACarDto = createBookACarDto(adminUser.getId(), savedCar.getId());
+    BookACar savedBooking = createBookACarEntity(bookACarDto, adminUser, savedCar);
+    bookACarRepository.save(savedBooking);
+
+    String authRequestBody = createAuthRequest();
+
+    MvcResult loginResult = mockMvc.perform(
+        MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
+            .content(authRequestBody)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    String jwtToken = extractJwtToken(loginResult);
+
+    mockMvc.perform(MockMvcRequestBuilders.get(ADMIN_URL + "/car/booking/{bookingId}/{status}",
+            savedBooking.getId(), "Approve").header("Authorization", "Bearer " + jwtToken))
+        .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    Optional<BookACar> updatedBookingOptional = bookACarRepository.findById(savedBooking.getId());
+    assertTrue(updatedBookingOptional.isPresent());
+    BookACar updatedBooking = updatedBookingOptional.get();
+    assertEquals(BookCarStatus.APPROVED, updatedBooking.getBookCarStatus());
+  }
+
+  @Test
+  void testChangeBookingStatusWithInvalidBookingId() throws Exception {
+    createAdminUser();
+
+    String authRequestBody = createAuthRequest();
+
+    MvcResult loginResult = mockMvc.perform(
+        MockMvcRequestBuilders.post(AUTH_URL + "/login").contentType(MediaType.APPLICATION_JSON)
+            .content(authRequestBody)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    String jwtToken = extractJwtToken(loginResult);
+
+    mockMvc.perform(
+            MockMvcRequestBuilders.get(ADMIN_URL + "/car/booking/{bookingId}/{status}", -1, "Approve")
+                .header("Authorization", "Bearer " + jwtToken))
+        .andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
   }
 
   private User createAdminUser() {
