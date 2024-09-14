@@ -14,11 +14,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgZorroImportsModule } from './ngZorroImportsModule';
 import { NzFormModule } from 'ng-zorro-antd/form';
+import { WelcomeComponent } from './welcome/welcome.component';
 
 registerLocaleData(en);
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, SignupComponent],
+  declarations: [AppComponent, LoginComponent, SignupComponent, WelcomeComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

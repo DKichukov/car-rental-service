@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { StorageService } from './auth/services/storage/storage.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { filter, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -9,19 +10,31 @@ import { Router } from '@angular/router';
 })
 export class AppComponent implements OnInit {
   title = 'frontend';
+  isCustomerLoggedIn: boolean = false;
+  isAdminLoggedIn: boolean = false
 
-  isCustomerLoggedIn: boolean = StorageService.isCustomerLoggedIn();
-  isAdminLoggedIn: boolean = StorageService.isAdminLoggedIn();
+  private routeDataSubscription: Subscription | undefined;
+  private routerEventsSubscription: Subscription | undefined;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.router.events.subscribe((event) => {
-      if (event.constructor.name === 'NavigationEnd') {
-        this.isAdminLoggedIn = StorageService.isAdminLoggedIn();
-        this.isCustomerLoggedIn = StorageService.isCustomerLoggedIn();
-      }
+    this.routerEventsSubscription = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.isAdminLoggedIn = StorageService.isAdminLoggedIn();
+      this.isCustomerLoggedIn = StorageService.isCustomerLoggedIn();
     });
+
+  }
+
+  ngOnDestroy(): void {
+    if (this.routeDataSubscription) {
+      this.routeDataSubscription.unsubscribe();
+    }
+    if (this.routerEventsSubscription) {
+      this.routerEventsSubscription.unsubscribe();
+    }
   }
 
   logout(): void {
