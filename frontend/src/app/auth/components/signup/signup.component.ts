@@ -39,13 +39,24 @@ export class SignupComponent implements OnInit {
   };
 
   register() {
-    this.authService.register(this.signupForm.value).subscribe((res) => {
-      if (res.id != null) {
-        this.message.success('Signup successfully', { nzDuration: 5000 });
-        this.router.navigateByUrl('/login');
-      } else {
-        this.message.error('Something went wrong', { nzDuration: 5000 });
-      }
-    });
-  }
+    this.authService.register(this.signupForm.value).subscribe(
+        (res) => {
+            if (res.id != null) {
+                this.message.success('Signup successfully', { nzDuration: 5000 });
+                this.router.navigateByUrl('/login');
+            } else {
+                this.message.error('Something went wrong', { nzDuration: 5000 });
+            }
+        },
+        (error) => {
+            if (error.status === 406) {
+                this.message.error('Customer already exists!', { nzDuration: 5000 });
+            } else if (error.status === 400) {
+                this.message.error('Customer not created!', { nzDuration: 5000 });
+            } else {
+                this.message.error('Something went wrong', { nzDuration: 5000 });
+            }
+        }
+    );
+}
 }
