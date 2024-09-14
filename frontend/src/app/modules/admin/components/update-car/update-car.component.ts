@@ -44,16 +44,16 @@ export class UdateCarComponent implements OnInit {
     private router: Router,
     private message: NzMessageService,
     private fb: FormBuilder,
-  ) {}
+  ) { }
   ngOnInit(): void {
     this.updateForm = this.fb.group({
-      name: [null, Validators.required],
-      brand: [null, Validators.required],
-      type: [null, Validators.required],
-      color: [null, Validators.required],
-      transmission: [null, Validators.required],
-      price: [null, Validators.required],
-      description: [null, Validators.required],
+      name: ['', Validators.required],
+      brand: ['', Validators.required],
+      type: ['', Validators.required],
+      color: ['', Validators.required],
+      transmission: ['', Validators.required],
+      price: ['', Validators.required],
+      description: ['', Validators.required],
       year: [null, Validators.required],
     });
     this.getCarById();
@@ -80,7 +80,10 @@ export class UdateCarComponent implements OnInit {
     formData.append('name', this.updateForm.get('name')?.value);
     formData.append('type', this.updateForm.get('type')?.value);
     formData.append('color', this.updateForm.get('color')?.value);
-    formData.append('year', this.updateForm.get('year')?.value);
+    const yearValue: Date | null = this.updateForm.get('year')?.value;
+    if (yearValue instanceof Date && !isNaN(yearValue.getTime())) {
+      formData.append('year', yearValue.getFullYear().toString());
+    }
     formData.append('transmission', this.updateForm.get('transmission')?.value);
     formData.append('description', this.updateForm.get('description')?.value);
     formData.append('price', this.updateForm.get('price')?.value);
