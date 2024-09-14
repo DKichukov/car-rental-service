@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  db:
+    image: djimy87/crs-app-db:postgres-14-db
+    container_name: postgres_db
+    restart: on-failure
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - crs-network
+
+  car-rental-service:
+    image: djimy87/crs-app-backend:crs-app
+    container_name: crs-app
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:${DB_PORT}/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+    networks:
+      - crs-network
+
+  angular-app:
+    image: djimy87/crs-app-frontend:angular-app
+    container_name: angular-app
+    ports:
+      - "4200:80"
+    networks:
+      - crs-network
+
+volumes:
+  db_data:
+
+networks:
+  crs-network:
