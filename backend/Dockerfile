@@ -5,29 +5,17 @@ COPY pom.xml .
 # Download dependencies in a separate layer
 RUN --mount=type=cache,target=/root/.m2 mvn dependency:go-offline
 COPY src ./src
-# Build the application
 RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests
+RUN rm -rf /root/.m2 /app/src /app/pom.xml
 
 # Production stage
 FROM pmpapplication/java21-alpine AS production
-
-# Create a non-root user to run the application
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-
-# Set working directory
 WORKDIR /app
-
-# Copy the built JAR from the build stage
 COPY --from=build /app/target/*.jar ./app.jar
-
-# Set ownership to the non-root user
 RUN chown -R appuser:appgroup /app
-
-# Switch to the non-root user
 USER appuser
-
-# Expose the port the app runs on
-EXPOSE ${SERVER_PORT}
+EXPOSE 8080
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]

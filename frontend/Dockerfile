@@ -5,15 +5,10 @@ COPY package*.json ./
 RUN npm ci --only=production
 COPY . .
 RUN npm run build -- --output-path=./dist/out --configuration production
+RUN rm -rf node_modules package-lock.json
 
-# Stage 2: Serve
-FROM nginx:stable-alpine
-COPY --from=node-builder /app/dist/out /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/nginx.conf
-RUN touch /var/run/nginx.pid && \
-    chown -R nginx:nginx /var/run/nginx.pid && \
-    chown -R nginx:nginx /var/cache/nginx && \
-    chown -R nginx:nginx /usr/share/nginx/html
-USER nginx
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Stage 2: Runtime
+FROM node:20.16.0-alpine AS runtime
+WORKDIR /app
+COPY --from=node-builder /app/dist/out /app
+CMD ["npx", "http-server", "-p", "4200"]
