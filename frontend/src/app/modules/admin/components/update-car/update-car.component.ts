@@ -10,7 +10,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
   templateUrl: './update-car.component.html',
   styleUrls: ['./update-car.component.scss'],
 })
-export class UdateCarComponent implements OnInit {
+export class UpdateCarComponent implements OnInit {
   isSpinning: boolean = false;
   carId: number = this.activatedRoute.snapshot.params['id'];
   imgChanged: boolean = false;

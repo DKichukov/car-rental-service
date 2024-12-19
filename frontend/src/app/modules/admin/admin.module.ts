@@ -7,11 +7,11 @@ import { NgZorroImportsModule } from 'src/app/ngZorroImportsModule';
 import { AdminRoutingModule } from './admin-routing.module';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { PostCarComponent } from './components/post-car/post-car.component';
-import { UdateCarComponent } from './components/update-car/update-car.component';
+import { UpdateCarComponent } from './components/update-car/update-car.component';
 import { SearchCarComponent } from './components/search-car/search-car.component';
 
 @NgModule({
-  declarations: [AdminDashboardComponent, PostCarComponent, UdateCarComponent, SearchCarComponent],
+  declarations: [AdminDashboardComponent, PostCarComponent, UpdateCarComponent, SearchCarComponent],
   imports: [
     CommonModule,
     AdminRoutingModule,

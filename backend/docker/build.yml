@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "${DB_PORT}:3306"
+      - "${DB_PORT}:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
@@ -39,6 +39,9 @@ services:
       context: ../../frontend
       dockerfile: Dockerfile
     image: djimy87/crs-app-frontend:v.0.0.1
+    environment:
+      API_URL: https://api.rental-car.duckdns.org
+      NODE_ENV: production
     ports:
       - "4200:4200"
     networks:

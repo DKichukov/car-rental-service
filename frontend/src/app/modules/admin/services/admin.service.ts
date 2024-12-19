@@ -3,18 +3,19 @@ import { Injectable } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Observable } from 'rxjs';
 import { StorageService } from 'src/app/auth/services/storage/storage.service';
-
-const BASE_URL = ['http://localhost:8080'];
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
+  private apiUrl = environment.apiUrl;
+
   constructor(private http: HttpClient, private message: NzMessageService) {}
 
   postCar(carDto: any): Observable<any> {
     const headers = this.createAuthorizationHeader();
-    return this.http.post(BASE_URL + '/api/admin/car', carDto, {
+    return this.http.post(`${this.apiUrl}/api/admin/car`, carDto, {
       headers: this.createAuthorizationHeader(),
     });
   }
@@ -28,38 +29,38 @@ export class AdminService {
   }
 
   getAllCars(): Observable<any> {
-    return this.http.get(BASE_URL + '/api/admin/cars', {
+    return this.http.get(`${this.apiUrl}/api/admin/cars`, {
       headers: this.createAuthorizationHeader(),
     });
   }
 
   deleteCar(id: number): Observable<any> {
-    return this.http.delete(BASE_URL + '/api/admin/car/' + id, {
+    return this.http.delete(`${this.apiUrl}/api/admin/car/${id}`, {
       headers: this.createAuthorizationHeader(),
     });
   }
 
   getCarById(id: number): Observable<any> {
-    return this.http.get(BASE_URL + '/api/admin/car/' + id, {
+    return this.http.get(`${this.apiUrl}/api/admin/car/${id}`, {
       headers: this.createAuthorizationHeader(),
     });
   }
 
   updateCar(carId: number, carDto: any): Observable<any> {
-    return this.http.put(BASE_URL + '/api/admin/car/' + carId, carDto, {
+    return this.http.put(`${this.apiUrl}/api/admin/car/${carId}`, carDto, {
       headers: this.createAuthorizationHeader(),
     });
   }
 
   getCarBookings(): Observable<any> {
-    return this.http.get(BASE_URL + '/api/admin/car/bookings', {
+    return this.http.get(`${this.apiUrl}/api/admin/car/bookings`, {
       headers: this.createAuthorizationHeader(),
     });
   }
 
   changeBookingStatus(bookingId: number, status: string): Observable<any> {
     return this.http.get(
-      `${BASE_URL}/api/admin/car/booking/${bookingId}/${status}`,
+      `${this.apiUrl}/api/admin/car/booking/${bookingId}/${status}`,
       {
         headers: this.createAuthorizationHeader(),
       }
@@ -68,7 +69,7 @@ export class AdminService {
 
   searchCar(searchCarDto: any): Observable<any> {
     const headers = this.createAuthorizationHeader();
-    return this.http.post(BASE_URL + '/api/admin/car/search', searchCarDto, {
+    return this.http.post(`${this.apiUrl}/api/admin/car/search`, searchCarDto, {
       headers: this.createAuthorizationHeader(),
     });
   }
