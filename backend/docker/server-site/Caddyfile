@@ -1,0 +1,14 @@
+{
+	email dzhamal.kichukov@gmail.com
+}
+app.rental-car.duckdns.org {
+	import /etc/caddy/headers.conf # Ensure this file exists and is valid
+	reverse_proxy angular-app:4200 # Proxy traffic to the Angular app running in the container
+	header {
+		Access-Control-Allow-Origin https://app.rental-car.duckdns.org # Restricts cross-origin requests
+		Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE" # Specifies allowed HTTP methods
+		Access-Control-Allow-Headers "*" # Allows any headers
+		Access-Control-Allow-Credentials true # Allows cookies and credentials
+		defer # Ensures headers are applied after other handlers
+	}
+}

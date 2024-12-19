@@ -1,0 +1,90 @@
+services:
+  db:
+    image: djimy87/crs-app-db:postgres-14-db
+    container_name: postgres_db
+    restart: on-failure
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - crs-network
+
+  #### build app ####
+  car-rental-service:
+    image: djimy87/crs-app-backend:v.0.0.1
+    container_name: crs-app
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    #image: crs-app
+    ports:
+      - "${SERVER_PORT}:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:${DB_PORT}/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+    networks:
+      - crs-network
+
+  ## build angular app ###
+  angular-app:
+    image: djimy87/crs-app-frontend:v.0.0.1
+    container_name: angular-app
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+    environment:
+      API_URL: https://api.rental-car.duckdns.org
+    #image: angular-app
+    ports:
+      - "4200:4200"
+    networks:
+      - crs-network
+
+  caddy:
+    image: caddy:2.9-alpine
+    restart: unless-stopped
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./headers.conf:/etc/caddy/headers.conf
+      - ./site:/srv
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - crs-network
+
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: duckdnsy
+    network_mode: host #optional
+    environment:
+      - PUID=1000 #optional
+      - PGID=1000 #optional
+      - TZ=Etc/UTC #optional
+      - SUBDOMAINS=rental-car
+      - TOKEN=adfc04f1-f899-4f02-9dc8-e1203c4f45e9
+      - UPDATE_IP=ipv4 #optional
+      - LOG_FILE=false #optional
+    volumes:
+      - ./duckdns_config:/config #optional
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  crs-network:
+    driver: bridge
